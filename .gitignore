@@ -1,9 +1,7 @@
 # Variables de entorno (credenciales) - NUNCA subir a GitHub
 .env
-.env.*
 
 # Logs de Java
-
 *.log
 hs_err_pid*.log
 replay_pid*.log
@@ -16,7 +14,6 @@ replay_pid*.log
 
 backend/build/
 backend/.gradle/
-.gradle/
 build/
 
 # IDEs
