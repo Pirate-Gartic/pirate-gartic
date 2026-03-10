@@ -7,8 +7,9 @@ hs_err_pid*.log
 replay_pid*.log
 
 # Archivos compilados de Java
-
+backend/build/
 *.class
+backend/bin/
 
 # Gradle
 
