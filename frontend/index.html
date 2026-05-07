@@ -6,7 +6,7 @@
     <title>Cháchara - Inicio</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ── Grid de selección de avatares ── */
+        /* ... (MANTÉN LOS ESTILOS QUE YA TENÍAS DE LOS AVATARES Y EL DISPLAY) ... */
         .avatar-picker {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -26,27 +26,15 @@
             background: #fff;
         }
 
-        .avatar-option img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            pointer-events: none;
-            display: block;
-        }
-
-        .avatar-option:hover {
-            transform: scale(1.1);
-        }
-
+        .avatar-option img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; display: block; }
+        .avatar-option:hover { transform: scale(1.1); }
         .avatar-option.selected {
             border-color: var(--btn-yellow);
             box-shadow: 0 0 0 3px #000, 0 0 0 5px var(--btn-yellow);
             transform: scale(1.12);
         }
 
-        /* Avatar grande (preview) — reemplaza el emoji estático */
-        #avatar-display,
-        #reg-avatar-display {
+        .avatar-display-box {
             width: 90px;
             height: 90px;
             border-radius: 50%;
@@ -60,19 +48,36 @@
             box-shadow: 0 4px 0 rgba(0,0,0,0.25);
             transition: transform 0.2s;
         }
+        .avatar-display-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .avatar-display-box:hover { transform: scale(1.05); }
 
-        #avatar-display img,
-        #reg-avatar-display img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+        /* ── NUEVOS ESTILOS PARA LAS PESTAÑAS ── */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 4px solid #000;
         }
-
-        #avatar-display:hover,
-        #reg-avatar-display:hover {
-            transform: scale(1.05);
+        .tab {
+            flex: 1;
+            padding: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #2563eb;
+            color: rgba(255,255,255,0.6);
+            border: 4px solid transparent;
+            border-bottom: none;
+            cursor: pointer;
+            border-radius: 15px 15px 0 0;
+            transition: background 0.2s, color 0.2s;
         }
+        .tab:hover { background: #1d4ed8; }
+        .tab.active {
+            background: var(--btn-yellow);
+            color: #000;
+            border-color: #000;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
@@ -89,69 +94,93 @@
         </header>
 
         <div class="card">
-
-            <!-- ── Vista: Invitado ── -->
-            <div id="view-guest" class="view-section">
-                <div class="avatar-selection">
-                    <div id="avatar-display">
-                        <!-- Se rellena con JS al cargar la página -->
-                    </div>
-                    <p>Elige tu avatar</p>
-                </div>
-
-                <!-- Grid de avatares para invitado -->
-                <div class="avatar-picker" id="guest-avatar-picker">
-                    <!-- Se genera con JS -->
-                </div>
-
-                <input type="text" id="username" placeholder="Escribe tu apodo..." maxlength="15" autocomplete="off">
-                <button id="btn-play">¡A JUGAR!</button>
-
-                <div class="toggle-links">
-                    <p onclick="switchView('view-login')">¿Ya tienes cuenta? Inicia sesión</p>
-                </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('tab-crear')">CREAR SALA</button>
+                <button class="tab" onclick="switchTab('tab-unirse')">UNIRSE</button>
             </div>
 
-            <!-- ── Vista: Login ── -->
-            <div id="view-login" class="view-section hidden">
-                <div class="avatar-selection">
-                    <div class="avatar-static">👋</div>
-                    <p>Bienvenido de vuelta</p>
+            <div id="tab-crear" class="tab-content active">
+                
+                <div id="crear-guest" class="view-section">
+                    <div class="avatar-selection">
+                        <div id="crear-avatar-display" class="avatar-display-box"></div>
+                        <p>Elige tu avatar</p>
+                    </div>
+                    <div class="avatar-picker" id="crear-avatar-picker"></div>
+                    
+                    <input type="text" id="crear-username" placeholder="Tu apodo (Invitado)" maxlength="15" autocomplete="off">
+                    <button id="btn-crear-sala">CREAR SALA</button>
+                    
+                    <div class="toggle-links">
+                        <p onclick="switchSubView('crear-guest', 'crear-login')">¿Tienes cuenta? Inicia sesión para crear</p>
+                    </div>
                 </div>
 
-                <input type="email" id="login-email" placeholder="Correo electrónico" autocomplete="off">
-                <input type="password" id="login-pass" placeholder="Contraseña">
-                <button id="btn-login">ENTRAR</button>
-
-                <div class="toggle-links">
-                    <p onclick="switchView('view-register')">¿No tienes cuenta? Regístrate</p>
-                    <p onclick="switchView('view-guest')">Jugar como invitado</p>
+                <div id="crear-login" class="view-section hidden">
+                    <div class="avatar-selection">
+                        <div class="avatar-static">👋</div>
+                        <p>Inicia sesión para crear</p>
+                    </div>
+                    <input type="email" id="crear-login-email" placeholder="Correo electrónico" autocomplete="off">
+                    <input type="password" id="crear-login-pass" placeholder="Contraseña">
+                    <button id="btn-crear-login">ENTRAR Y CREAR</button>
+                    
+                    <div class="toggle-links">
+                        <p onclick="switchSubView('crear-login', 'crear-register')">¿No tienes cuenta? Regístrate</p>
+                        <p onclick="switchSubView('crear-login', 'crear-guest')">Mejor como invitado</p>
+                    </div>
                 </div>
+
+                <div id="crear-register" class="view-section hidden">
+                    <div class="avatar-selection">
+                        <div id="reg-avatar-display" class="avatar-display-box"></div>
+                        <p>Elige tu avatar</p>
+                    </div>
+                    <div class="avatar-picker" id="reg-avatar-picker"></div>
+                    <input type="text" id="reg-username" placeholder="Nombre de usuario" maxlength="15" autocomplete="off">
+                    <input type="email" id="reg-email" placeholder="Correo electrónico" autocomplete="off">
+                    <input type="password" id="reg-pass" placeholder="Contraseña">
+                    <button id="btn-register">REGISTRARSE</button>
+                    <div class="toggle-links">
+                        <p onclick="switchSubView('crear-register', 'crear-login')">Volver al login</p>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- ── Vista: Registro ── -->
-            <div id="view-register" class="view-section hidden">
-                <div class="avatar-selection">
-                    <div id="reg-avatar-display">
-                        <!-- Se rellena con JS -->
+            <div id="tab-unirse" class="tab-content">
+                
+                <input type="text" id="unirse-codigo" placeholder="CÓDIGO DE SALA" maxlength="6" style="text-transform: uppercase; font-weight: bold; font-size: 1.5rem; letter-spacing: 5px;">
+
+                <div id="unirse-guest" class="view-section">
+                    <div class="avatar-selection">
+                        <div id="unirse-avatar-display" class="avatar-display-box"></div>
                     </div>
-                    <p>Elige tu avatar</p>
+                    <div class="avatar-picker" id="unirse-avatar-picker"></div>
+                    
+                    <input type="text" id="unirse-username" placeholder="Tu apodo (Invitado)" maxlength="15" autocomplete="off">
+                    <button id="btn-unirse-sala">UNIRSE A LA SALA</button>
+                    
+                    <div class="toggle-links">
+                        <p onclick="switchSubView('unirse-guest', 'unirse-login')">¿Tienes cuenta? Inicia sesión para unirte</p>
+                    </div>
                 </div>
 
-                <!-- Grid de avatares para registro -->
-                <div class="avatar-picker" id="reg-avatar-picker">
-                    <!-- Se genera con JS -->
+                <div id="unirse-login" class="view-section hidden">
+                    <div class="avatar-selection">
+                        <div class="avatar-static">🔑</div>
+                        <p>Usa tu cuenta para unirte</p>
+                    </div>
+                    <input type="email" id="unirse-login-email" placeholder="Correo electrónico" autocomplete="off">
+                    <input type="password" id="unirse-login-pass" placeholder="Contraseña">
+                    <button id="btn-unirse-login">ENTRAR Y UNIRSE</button>
+                    
+                    <div class="toggle-links">
+                        <p onclick="switchSubView('unirse-login', 'unirse-guest')">Unirse como invitado en su lugar</p>
+                    </div>
                 </div>
 
-                <input type="text" id="reg-username" placeholder="Nombre de usuario" maxlength="15" autocomplete="off">
-                <input type="email" id="reg-email" placeholder="Correo electrónico" autocomplete="off">
-                <input type="password" id="reg-pass" placeholder="Contraseña">
-                <button id="btn-register">REGISTRARSE</button>
-
-                <div class="toggle-links">
-                    <p onclick="switchView('view-login')">¿Ya tienes cuenta? Inicia sesión</p>
-                    <p onclick="switchView('view-guest')">Jugar como invitado</p>
-                </div>
             </div>
 
         </div>
