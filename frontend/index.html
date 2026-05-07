@@ -5,6 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cháchara - Inicio</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── Grid de selección de avatares ── */
+        .avatar-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .avatar-option {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 3px solid #000;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+            background: #fff;
+        }
+
+        .avatar-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            display: block;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+        }
+
+        .avatar-option.selected {
+            border-color: var(--btn-yellow);
+            box-shadow: 0 0 0 3px #000, 0 0 0 5px var(--btn-yellow);
+            transform: scale(1.12);
+        }
+
+        /* Avatar grande (preview) — reemplaza el emoji estático */
+        #avatar-display,
+        #reg-avatar-display {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid #000;
+            overflow: hidden;
+            background: #fff;
+            margin: 0 auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+            transition: transform 0.2s;
+        }
+
+        #avatar-display img,
+        #reg-avatar-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #avatar-display:hover,
+        #reg-avatar-display:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
     <div class="doodle d1">✏️</div>
@@ -13,28 +82,37 @@
     <div class="doodle d4">💡</div>
     <div class="doodle d5">😂</div>
     <div class="doodle d6">🎲</div>
-     
+
     <div class="login-container">
         <header class="logo">
             <h1>CHÁCHARA</h1>
         </header>
-        
+
         <div class="card">
+
+            <!-- ── Vista: Invitado ── -->
             <div id="view-guest" class="view-section">
                 <div class="avatar-selection">
-                    <div id="avatar-display">🎨</div>
+                    <div id="avatar-display">
+                        <!-- Se rellena con JS al cargar la página -->
+                    </div>
                     <p>Elige tu avatar</p>
                 </div>
 
+                <!-- Grid de avatares para invitado -->
+                <div class="avatar-picker" id="guest-avatar-picker">
+                    <!-- Se genera con JS -->
+                </div>
+
                 <input type="text" id="username" placeholder="Escribe tu apodo..." maxlength="15" autocomplete="off">
-                
                 <button id="btn-play">¡A JUGAR!</button>
-                
+
                 <div class="toggle-links">
                     <p onclick="switchView('view-login')">¿Ya tienes cuenta? Inicia sesión</p>
                 </div>
             </div>
 
+            <!-- ── Vista: Login ── -->
             <div id="view-login" class="view-section hidden">
                 <div class="avatar-selection">
                     <div class="avatar-static">👋</div>
@@ -43,34 +121,42 @@
 
                 <input type="email" id="login-email" placeholder="Correo electrónico" autocomplete="off">
                 <input type="password" id="login-pass" placeholder="Contraseña">
-                
                 <button id="btn-login">ENTRAR</button>
-                
+
                 <div class="toggle-links">
                     <p onclick="switchView('view-register')">¿No tienes cuenta? Regístrate</p>
                     <p onclick="switchView('view-guest')">Jugar como invitado</p>
                 </div>
             </div>
 
+            <!-- ── Vista: Registro ── -->
             <div id="view-register" class="view-section hidden">
                 <div class="avatar-selection">
-                    <div class="avatar-static">✨</div>
-                    <p>Crea tu cuenta</p>
+                    <div id="reg-avatar-display">
+                        <!-- Se rellena con JS -->
+                    </div>
+                    <p>Elige tu avatar</p>
+                </div>
+
+                <!-- Grid de avatares para registro -->
+                <div class="avatar-picker" id="reg-avatar-picker">
+                    <!-- Se genera con JS -->
                 </div>
 
                 <input type="text" id="reg-username" placeholder="Nombre de usuario" maxlength="15" autocomplete="off">
                 <input type="email" id="reg-email" placeholder="Correo electrónico" autocomplete="off">
                 <input type="password" id="reg-pass" placeholder="Contraseña">
-                
                 <button id="btn-register">REGISTRARSE</button>
-                
+
                 <div class="toggle-links">
                     <p onclick="switchView('view-login')">¿Ya tienes cuenta? Inicia sesión</p>
                     <p onclick="switchView('view-guest')">Jugar como invitado</p>
                 </div>
             </div>
+
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

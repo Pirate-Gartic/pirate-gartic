@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cháchara - Sala de Espera</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+            align-items: flex-start;
+        }
+
+        .lobby-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 28px 16px 40px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* ── Logo ── */
+        .lobby-logo {
+            color: var(--btn-yellow);
+            font-size: 2.8rem;
+            text-shadow: 4px 4px 0 #000;
+            margin: 0 0 20px;
+            letter-spacing: 2px;
+        }
+
+        /* ── Código de sala ── */
+        .room-code-box {
+            background: rgba(0, 0, 0, 0.25);
+            border: 4px solid #000;
+            border-radius: 18px;
+            padding: 14px 28px;
+            text-align: center;
+            margin-bottom: 22px;
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.08);
+        }
+
+        .room-code-label {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.82rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 0 0 6px;
+        }
+
+        .room-code-value {
+            color: var(--btn-yellow);
+            font-size: 2.6rem;
+            letter-spacing: 10px;
+            text-shadow: 3px 3px 0 #000;
+            display: block;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .btn-copiar {
+            width: auto;
+            padding: 8px 18px;
+            font-size: 1rem;
+            margin: 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 0 var(--btn-shadow), 0 4px 0 3px #000;
+        }
+
+        .btn-copiar:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 var(--btn-shadow), 0 1px 0 3px #000;
+        }
+
+        /* ── Panel de jugadores ── */
+        .players-panel {
+            background: var(--card-blue);
+            border: 5px solid #000;
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 9px 0 var(--card-border), 0 9px 0 5px #000;
+            width: 100%;
+            max-width: 580px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .panel-header h2 {
+            color: #fff;
+            font-size: 1.25rem;
+            margin: 0;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .player-count-badge {
+            background: rgba(0,0,0,0.25);
+            color: var(--btn-yellow);
+            font-size: 1rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 2px solid rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        /* ── Grid de jugadores ── */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        /* ── Tarjeta de jugador ── */
+        .player-card {
+            aspect-ratio: 1;
+            border-radius: 16px;
+            border: 3px solid #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 6px 4px;
+            position: relative;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.35);
+            overflow: hidden;
+            transition: transform 0.15s;
+        }
+
+        .player-card.filled {
+            animation: pop-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .player-card.filled:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Colores por slot — estilo Kahoot */
+        .player-card.c0 { background: #e84393; }
+        .player-card.c1 { background: #1a9bbd; }
+        .player-card.c2 { background: #e8a018; }
+        .player-card.c3 { background: #3dab5a; }
+        .player-card.c4 { background: #9b3dcc; }
+        .player-card.c5 { background: #e84a38; }
+        .player-card.c6 { background: #0d9e8a; }
+        .player-card.c7 { background: #e06020; }
+
+        /* Slot vacío */
+        .player-card.empty {
+            background: rgba(0,0,0,0.15);
+            border: 3px dashed rgba(255,255,255,0.18);
+            box-shadow: none;
+        }
+
+        /* Avatar circular */
+        .card-avatar {
+            width: 52%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.35);
+            overflow: hidden;
+            background: rgba(255,255,255,0.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .card-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-avatar-empty {
+            font-size: 1.4rem;
+            opacity: 0.25;
+        }
+
+        /* Nickname */
+        .card-name {
+            color: #fff;
+            font-size: 0.72rem;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 92%;
+            font-weight: 600;
+        }
+
+        .card-name-empty {
+            color: rgba(255,255,255,0.22);
+            font-size: 0.68rem;
+        }
+
+        /* Corona de host */
+        .host-crown {
+            position: absolute;
+            top: 3px;
+            right: 5px;
+            font-size: 0.75rem;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4));
+        }
+
+        /* Resaltar al jugador actual */
+        .player-card.is-me {
+            outline: 3px solid var(--btn-yellow);
+            outline-offset: 2px;
+        }
+
+        /* ── Mensajes de estado ── */
+        .status-msg {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.05rem;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+            text-align: center;
+            margin: 0 0 16px;
+            min-height: 1.4rem;
+        }
+
+        /* ── Botón JUGAR ── */
+        .btn-jugar {
+            width: 100%;
+            max-width: 340px;
+            padding: 16px;
+            font-size: 2rem;
+            border-radius: 18px;
+            box-shadow: 0 8px 0 var(--btn-shadow), 0 8px 0 5px #000;
+            margin-bottom: 0;
+            letter-spacing: 1px;
+        }
+
+        .btn-jugar:disabled {
+            background-color: rgba(250, 204, 21, 0.35);
+            color: rgba(0,0,0,0.4);
+            cursor: not-allowed;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.2), 0 3px 0 3px rgba(0,0,0,0.15);
+            transform: none !important;
+        }
+
+        /* ── Botón Salir ── */
+        .btn-salir {
+            width: auto;
+            padding: 10px 22px;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.85);
+            border: 3px solid rgba(255,255,255,0.25);
+            border-radius: 14px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15), 0 4px 0 3px rgba(0,0,0,0.08);
+            margin-top: 14px;
+        }
+
+        .btn-salir:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Spinner de carga */
+        .loading {
+            color: rgba(255,255,255,0.6);
+            font-size: 1rem;
+            text-align: center;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="doodle d1">✏️</div>
+    <div class="doodle d2">💬</div>
+    <div class="doodle d3">🎨</div>
+    <div class="doodle d4">💡</div>
+    <div class="doodle d5">😂</div>
+    <div class="doodle d6">🎲</div>
+
+    <div class="lobby-wrapper">
+
+        <h1 class="lobby-logo">CHÁCHARA</h1>
+
+        <!-- Código de sala -->
+        <div class="room-code-box">
+            <p class="room-code-label">Código de sala</p>
+            <span class="room-code-value" id="codigo-display">------</span>
+            <button class="btn-copiar" id="btn-copiar">📋 Copiar enlace</button>
+        </div>
+
+        <!-- Panel de jugadores -->
+        <div class="players-panel">
+            <div class="panel-header">
+                <h2>Jugadores</h2>
+                <span class="player-count-badge" id="player-count">0 / 8</span>
+            </div>
+            <div class="players-grid" id="players-grid">
+                <p class="loading">Conectando con la sala...</p>
+            </div>
+        </div>
+
+        <!-- Mensaje de estado -->
+        <p class="status-msg" id="status-msg"></p>
+
+        <!-- Botón JUGAR -->
+        <button class="btn-jugar" id="btn-jugar" disabled>▶ JUGAR</button>
+
+        <!-- Salir -->
+        <button class="btn-salir" id="btn-salir">← Salir de la sala</button>
+
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+
+        // ── Datos de sesión ──
+        const urlParams   = new URLSearchParams(window.location.search);
+        const codigoUrl   = urlParams.get('codigo');
+        const codigo      = codigoUrl || localStorage.getItem('codigoSala');
+        const idJugador   = localStorage.getItem('idJugador');
+        const esHost      = localStorage.getItem('esHost') === 'true';
+        const isGuest     = localStorage.getItem('isGuest') === 'true';
+
+        // Guardar código en localStorage si vino por URL
+        if (codigoUrl) localStorage.setItem('codigoSala', codigoUrl);
+
+        // ── Si no hay datos de sesión, redirigir ──
+        if (!codigo) {
+            window.location.href = 'index.html';
+        }
+
+        // Si hay código en URL pero no hay idJugador → el usuario llegó por link directo
+        if (codigoUrl && !idJugador) {
+            window.location.href = `index.html?join=${codigoUrl}`;
+        }
+
+        // ── Mostrar código ──
+        document.getElementById('codigo-display').textContent = codigo;
+
+        // ── Botón copiar enlace ──
+        document.getElementById('btn-copiar').addEventListener('click', () => {
+            const url = `${window.location.origin}${window.location.pathname}?codigo=${codigo}`;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.getElementById('btn-copiar');
+                btn.textContent = '✅ ¡Enlace copiado!';
+                setTimeout(() => btn.textContent = '📋 Copiar enlace', 2500);
+            }).catch(() => {
+                prompt('Copia este enlace y compártelo:', url);
+            });
+        });
+
+        // ── Habilitar botón JUGAR solo para el host ──
+        const btnJugar = document.getElementById('btn-jugar');
+        if (esHost) btnJugar.disabled = false;
+
+        // ── Renderizar grid de jugadores ──
+        const CARD_COLORS = ['c0','c1','c2','c3','c4','c5','c6','c7'];
+
+        function renderPlayers(jugadores, maxJugadores) {
+            const grid = document.getElementById('players-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < maxJugadores; i++) {
+                const card = document.createElement('div');
+
+                if (i < jugadores.length) {
+                    const j = jugadores[i];
+                    const esMiTarjeta = j.idJugador === idJugador;
+                    card.className = `player-card filled ${CARD_COLORS[i % CARD_COLORS.length]}${esMiTarjeta ? ' is-me' : ''}`;
+
+                    // Avatar circular
+                    const avatarDiv = document.createElement('div');
+                    avatarDiv.className = 'card-avatar';
+
+                    if (j.avatarUrl && j.avatarUrl.trim() !== '') {
+                        const img = document.createElement('img');
+                        img.src   = j.avatarUrl;   // ruta relativa completa guardada en BD
+                        img.alt   = j.nickname;
+                        img.onerror = () => { avatarDiv.innerHTML = '<span class="card-avatar-empty">🎨</span>'; };
+                        avatarDiv.appendChild(img);
+                    } else {
+                        avatarDiv.innerHTML = '<span class="card-avatar-empty">🎨</span>';
+                    }
+
+                    // Nombre
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'card-name';
+                    nameSpan.textContent = j.nickname;
+
+                    card.appendChild(avatarDiv);
+                    card.appendChild(nameSpan);
+
+                    // Corona de host
+                    if (j.esHost) {
+                        const crown = document.createElement('span');
+                        crown.className = 'host-crown';
+                        crown.textContent = '👑';
+                        card.appendChild(crown);
+                    }
+
+                } else {
+                    // Slot vacío
+                    card.className = 'player-card empty';
+                    card.innerHTML = `
+                        <div class="card-avatar">
+                            <span class="card-avatar-empty">?</span>
+                        </div>
+                        <span class="card-name card-name-empty">Vacío</span>
+                    `;
+                }
+
+                grid.appendChild(card);
+            }
+
+            document.getElementById('player-count').textContent =
+                `${jugadores.length} / ${maxJugadores}`;
+        }
+
+        // ── Polling: actualizar sala cada 2 segundos ──
+        let pollInterval;
+
+        async function actualizarSala() {
+            try {
+                const resp = await fetch(`${API_URL}/salas/${codigo}`);
+
+                if (!resp.ok) {
+                    document.getElementById('status-msg').textContent =
+                        'No se pudo conectar con la sala. ¿El backend está corriendo?';
+                    return;
+                }
+
+                const data = await resp.json();
+
+                // Si el juego ya inició, redirigir a todos los jugadores
+                if (data.estado === 'JUGANDO') {
+                    clearInterval(pollInterval);
+                    window.location.href = 'game.html';
+                    return;
+                }
+
+                renderPlayers(data.jugadores, data.maxJugadores);
+
+                // Mensaje de estado según rol
+                const statusEl = document.getElementById('status-msg');
+                if (esHost) {
+                    statusEl.textContent = data.jugadores.length > 1
+                        ? `¡${data.jugadores.length} jugadores listos! Presiona JUGAR cuando quieras.`
+                        : 'Comparte el código para que otros se unan...';
+                } else {
+                    statusEl.textContent = 'Esperando que el anfitrión inicie el juego...';
+                }
+
+            } catch (err) {
+                document.getElementById('status-msg').textContent =
+                    'Error de conexión. Reintentando...';
+            }
+        }
+
+        pollInterval = setInterval(actualizarSala, 2000);
+        actualizarSala(); // Llamada inmediata al cargar
+
+        // ── Botón JUGAR (solo host) ──
+        btnJugar.addEventListener('click', async () => {
+            if (!esHost) return;
+            btnJugar.disabled = true;
+            btnJugar.textContent = '⏳ Iniciando...';
+            try {
+                const resp = await fetch(`${API_URL}/salas/${codigo}/iniciar`, { method: 'PUT' });
+                if (!resp.ok) {
+                    btnJugar.disabled = false;
+                    btnJugar.textContent = '▶ JUGAR';
+                    alert('No se pudo iniciar el juego.');
+                }
+                // Si fue exitoso, el próximo poll detectará "JUGANDO" y redirigirá a todos
+            } catch (err) {
+                btnJugar.disabled = false;
+                btnJugar.textContent = '▶ JUGAR';
+                alert('Error al iniciar el juego.');
+            }
+        });
+
+        // ── Botón Salir ──
+        document.getElementById('btn-salir').addEventListener('click', async () => {
+            clearInterval(pollInterval);
+            await eliminarJugador();
+            window.location.href = 'index.html';
+        });
+
+        // ── Eliminar jugador de la BD ──
+        async function eliminarJugador() {
+            if (!idJugador) return;
+            try {
+                await fetch(`${API_URL}/jugadores/${idJugador}`, {
+                    method: 'DELETE',
+                    keepalive: true   // permite que la request sobreviva al cierre del tab
+                });
+            } catch (e) { /* silencioso */ }
+            // Limpiar localStorage de sesión de sala
+            localStorage.removeItem('idJugador');
+            localStorage.removeItem('codigoSala');
+            localStorage.removeItem('esHost');
+        }
+
+        // ── Al cerrar el tab/ventana, eliminar al jugador de la sala ──
+        // Esto aplica tanto a invitados como a usuarios registrados,
+        // ya que "jugadores" es una tabla de sesión, no permanente.
+        window.addEventListener('beforeunload', () => {
+            if (idJugador) {
+                // keepalive:true es clave para que la request llegue al backend
+                // aunque la página se esté cerrando
+                fetch(`${API_URL}/jugadores/${idJugador}`, {
+                    method: 'DELETE',
+                    keepalive: true
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

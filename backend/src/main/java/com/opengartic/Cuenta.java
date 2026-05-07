@@ -25,7 +25,11 @@ public class Cuenta {
     @Column(name = "creado_en", insertable = false, updatable = false)
     private Timestamp creadoEn;
 
-    public Cuenta() {} 
+    // La columna en PostgreSQL se llama "avatar" (ver DDL de cuentas)
+    @Column(name = "avatar")
+    private String avatar;
+
+    public Cuenta() {}
 
     public Cuenta(String correo, String contrasena, String nombreUsuario) {
         this.correo = correo;
@@ -34,14 +38,16 @@ public class Cuenta {
     }
 
     // Getters
-    public UUID getIdCuenta() { return idCuenta; }
-    public String getCorreo() { return correo; }
-    public String getContrasena() { return contrasena; }
+    public UUID getIdCuenta()       { return idCuenta; }
+    public String getCorreo()        { return correo; }
+    public String getContrasena()    { return contrasena; }
     public String getNombreUsuario() { return nombreUsuario; }
-    public Timestamp getCreadoEn() { return creadoEn; }
+    public Timestamp getCreadoEn()   { return creadoEn; }
+    public String getAvatar()        { return avatar; }
 
     // Setters
-    public void setCorreo(String correo) { this.correo = correo; }
-    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
+    public void setCorreo(String correo)               { this.correo = correo; }
+    public void setContrasena(String contrasena)       { this.contrasena = contrasena; }
     public void setNombreUsuario(String nombreUsuario) { this.nombreUsuario = nombreUsuario; }
+    public void setAvatar(String avatar)               { this.avatar = avatar; }
 }

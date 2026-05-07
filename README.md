@@ -1,10 +1,13 @@
 # Chachara
-
 **Proyecto Semestral - Diseño de Aplicaciones Web**
 
 *IDS 6to Semestre*
 
 Este proyecto busca realizar un **juego online** interactivo inspirado por el juego de mesa *Pictionary* en donde un grupo de personas intentan dibujar la oración o palabra dada.
+
+<p align="center">
+<img src="frontend/assets/logos/logo.png" width="150" alt="Logo de Cháchara">
+</p>
 
 --- 
 ## Descripción
@@ -34,13 +37,21 @@ Entre las funcionalidades proyectadas se encuentran: salas de juego con código 
    .\gradlew bootRun
    ```
 
-   El servidor se iniciará en `http://localhost:8081`.
+   El servidor se iniciará en `http://localhost:8080`.
 
 3. **Ejecutar el frontend:**
+
+   - Instala en *Visual Studio Code* la extensión **Live Server**:
+   <p align="center">
+   <img src="docs/images/Live_Server_extension.png" width="250" alt="Extensión Live Server">
+   </p>
    
-   Abre el archivo [`frontend/index.html`](https://github.com/chachara-dev/open-gartic/blob/dev/frontend/index.html) en tu navegador web.
-   
-   El frontend se conectará automáticamente al backend en `localhost:8081`.
+   - Haz **click derecho** sobre el archivo [`index.html`](https://github.com/chachara-dev/open-gartic/blob/dev/frontend/index.html) y selecciona *Open with Live Server*.
+   <p align="center">
+   <img src="docs/images/Abrir_Live_Server.png" width="250" alt="Abrir con Live Server">
+   </p>
+
+El frontend automaticamente se conectará con el backend y levantará un servidor local.
 
 ---
 ## Herramientas utilizadas
