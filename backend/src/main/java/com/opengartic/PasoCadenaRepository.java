@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface PasoCadenaRepository extends JpaRepository<PasoCadena, UUID> {
@@ -23,4 +25,7 @@ public interface PasoCadenaRepository extends JpaRepository<PasoCadena, UUID> {
 
     // Todos los pasos de un jugador (para estadísticas)
     List<PasoCadena> findByIdJugador(UUID idJugador);
+    // Contar pasos de una ronda específica en todas las cadenas de una sala (para sincronización)
+    @Query("SELECT COUNT(p) FROM PasoCadena p JOIN Cadena c ON p.idCadena = c.idCadena WHERE c.idSala = :idSala AND p.ordenRonda = :ordenRonda")
+    int countByIdSalaAndOrdenRonda(@Param("idSala") UUID idSala, @Param("ordenRonda") Short ordenRonda);
 }

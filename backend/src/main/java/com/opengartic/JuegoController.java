@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/juego")
@@ -12,6 +13,8 @@ import java.util.Map;
 public class JuegoController {
 
     @Autowired private JuegoService juegoService;
+    @Autowired private PasoCadenaRepository pasoRepo;
+    @Autowired private CadenaRepository cadenaRepo;
 
     // Llama el host para generar las cadenas iniciales
     @PostMapping("/{idSala}/iniciar")
@@ -31,8 +34,6 @@ public class JuegoController {
     public ResponseEntity<?> resultados(@PathVariable UUID idSala) {
         return ResponseEntity.ok(juegoService.obtenerResultados(idSala));
     }
-    @Autowired private PasoCadenaRepository pasoRepo;
-    @Autowired private CadenaRepository cadenaRepo;
 
     @PostMapping("/paso")
     public ResponseEntity<?> guardarPaso(@RequestBody Map<String, String> body) {
@@ -51,11 +52,25 @@ public class JuegoController {
         paso.setOrdenRonda(ordenRonda);
         pasoRepo.save(paso);
 
-        // 2. Avanzar la ronda de esta cadena específica
+        // 2. Obtener datos de la cadena y la sala
         Cadena cadena = cadenaRepo.findById(idCadena).get();
-        cadena.setRondaActual((short)(ordenRonda + 1));
-        cadenaRepo.save(cadena);
-
+        UUID idSala = cadena.getIdSala();
+        List<Cadena> cadenasDeSala = cadenaRepo.findByIdSala(idSala);
+        
+        // 3. Contar pasos completados para esta ronda en esta sala
+        int numPasosCompletados = pasoRepo.countByIdSalaAndOrdenRonda(idSala, ordenRonda);
+        
+        // 4. Contar cadenas (= número de jugadores que deberían completar)
+        int numCadenas = cadenasDeSala.size();
+        
+        // 5. Si se completó la ronda, avanzar TODAS las cadenas
+        if (numPasosCompletados == numCadenas) {
+            for (Cadena c : cadenasDeSala) {
+                c.setRondaActual((short)(ordenRonda + 1));
+                cadenaRepo.save(c);
+            }
+        }
+        
         return ResponseEntity.ok("Turno guardado.");
     }
 }
