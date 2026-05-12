@@ -51,7 +51,6 @@ public class SalaController {
     public ResponseEntity<?> crearSala(@RequestBody Map<String, String> body) {
         String nickname  = body.get("nickname");
         String avatarUrl = body.get("avatarUrl");
-        String idCuentaStr = body.get("idCuenta");
 
         if (nickname == null || nickname.isBlank())
             return ResponseEntity.badRequest().body("El apodo es obligatorio.");
@@ -67,9 +66,7 @@ public class SalaController {
         jugador.setNickname(nickname.trim());
         jugador.setAvatarUrl(avatarUrl);
         jugador.setEsHost(true);
-        if (idCuentaStr != null && !idCuentaStr.isBlank()) {
-            try { jugador.setIdCuenta(UUID.fromString(idCuentaStr)); } catch (Exception ignored) {}
-        }
+        // 🔥 Se eliminó la lógica de idCuenta 🔥
         jugador = jugadorRepo.save(jugador);
 
         Map<String, String> resp = new HashMap<>();
@@ -112,10 +109,7 @@ public class SalaController {
         jugador.setNickname(nickname.trim());
         jugador.setAvatarUrl(body.get("avatarUrl"));
         jugador.setEsHost(false);
-        String idCuentaStr = body.get("idCuenta");
-        if (idCuentaStr != null && !idCuentaStr.isBlank()) {
-            try { jugador.setIdCuenta(UUID.fromString(idCuentaStr)); } catch (Exception ignored) {}
-        }
+        // 🔥 Se eliminó la lógica de idCuenta 🔥
         jugador = jugadorRepo.save(jugador);
 
         Map<String, String> resp = new HashMap<>();
@@ -157,7 +151,7 @@ public class SalaController {
     }
 
     // ────────────────────────────────────────────────────────
-    //  PUT /api/salas/{idSala}/reiniciar (NUEVO PARA REJUGAR)
+    //  PUT /api/salas/{idSala}/reiniciar
     // ────────────────────────────────────────────────────────
     @PutMapping("/salas/{idSala}/reiniciar")
     public ResponseEntity<?> reiniciarSala(@PathVariable UUID idSala) {
@@ -170,7 +164,7 @@ public class SalaController {
     }
 
     // ────────────────────────────────────────────────────────
-    //  DELETE /api/salas/{id} (NUEVO PARA DESTRUIR SALA AL CERRAR PESTAÑA)
+    //  DELETE /api/salas/{id}
     // ────────────────────────────────────────────────────────
     @DeleteMapping("/salas/{id}")
     public ResponseEntity<Void> eliminarSala(@PathVariable UUID id) {
