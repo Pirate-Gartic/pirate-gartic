@@ -447,6 +447,11 @@
 
                 const data = await resp.json();
 
+                // Guardar idSala para usar en el botón JUGAR
+                if (data.idSala) {
+                    localStorage.setItem('idSala', data.idSala);
+                }
+
                 // Si el juego ya inició, redirigir a todos los jugadores
                 if (data.estado === 'JUGANDO') {
                     clearInterval(pollInterval);
