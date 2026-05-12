@@ -416,11 +416,17 @@ const timerInterval = setInterval(() => {
     }
 }, 1000);
 
+// ═══════════════════════════════════════════════════════════
+//  LOCK CANVAS Y ENVIAR AL BACKEND (Actualizado)
+// ═══════════════════════════════════════════════════════════
 
-// ═══════════════════════════════════════════════════════════
-//  LOCK CANVAS (Listo! o tiempo agotado)
-// ═══════════════════════════════════════════════════════════
-function lockCanvas(timedOut = false) {
+// Recuperar el prompt que debemos dibujar desde el LocalStorage
+const promptGuardado = localStorage.getItem('promptAnterior');
+if(promptGuardado) {
+    document.getElementById('prompt-text').textContent = '🎨 ' + promptGuardado;
+}
+
+async function lockCanvas(timedOut = false) {
     isLocked = true;
     clearInterval(timerInterval);
 
@@ -430,32 +436,69 @@ function lockCanvas(timedOut = false) {
     document.getElementById('btn-undo').disabled  = true;
     document.getElementById('btn-clear').disabled = true;
 
-    // Guardar dibujo como base64 en localStorage
-    // (En producción: enviar al backend como paso de tipo DIBUJO en tabla pasos_cadena)
-    try {
-        const dataUrl = canvas.toDataURL('image/png');
-        localStorage.setItem('lastDrawingData',   dataUrl);
-        localStorage.setItem('lastDrawingPrompt', promptEl.textContent);
-        localStorage.setItem('lastDrawingCodigo', codigoSala);
-    } catch(e) { /* quota exceeded: ignorar */ }
-
-    // Mostrar overlay
-    const overlay  = document.getElementById('done-overlay');
-    const iconEl   = document.getElementById('done-icon');
-    const titleEl  = document.getElementById('done-title');
-    const msgEl    = document.getElementById('done-msg');
-
-    if (timedOut) {
-        iconEl.textContent  = '⏰';
-        titleEl.textContent = '¡Se acabó el tiempo!';
-        msgEl.innerHTML     = 'Tu dibujo fue guardado automáticamente<span class="dots"></span>';
-    } else {
-        iconEl.textContent  = '🎉';
-        titleEl.textContent = '¡Dibujito guardado!';
-        msgEl.innerHTML     = 'Esperando a los demás jugadores<span class="dots"></span>';
-    }
-
+    const overlay = document.getElementById('done-overlay');
+    document.getElementById('done-msg').innerHTML = 'Guardando tu obra de arte...<span class="dots"></span>';
     overlay.classList.add('show');
+
+    const dataUrl = canvas.toDataURL('image/png');
+    const idSala = localStorage.getItem('idSala');
+    const idJugador = localStorage.getItem('idJugador');
+    const rondaActual = localStorage.getItem('rondaActual') || "2";
+    const idCadena = localStorage.getItem('idCadena');
+
+    try {
+        // 1. Subir a DynamoDB (Tu endpoint existente)
+        const respDyn = await fetch('http://localhost:8080/api/dibujos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                idSala: idSala,
+                idJugador: idJugador,
+                ordenRonda: rondaActual,
+                imagenBase64: dataUrl
+            })
+        });
+        const dataDyn = await respDyn.json();
+        const dynamoKey = dataDyn.idImagen;
+
+        // 2. Avisar al backend que terminamos este turno
+        await fetch('http://localhost:8080/api/juego/paso', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                idCadena: idCadena,
+                idJugador: idJugador,
+                tipo: 'DIBUJO',
+                contenido: dynamoKey,
+                ordenRonda: rondaActual
+            })
+        });
+
+        // 3. Esperar a los demás
+        document.getElementById('done-msg').innerHTML = 'Esperando a los demás jugadores<span class="dots"></span>';
+        
+        const check = setInterval(async () => {
+            const res = await fetch(`http://localhost:8080/api/juego/${idSala}/turno/${idJugador}`);
+            const data = await res.json();
+
+            if (data.juegoTerminado) {
+                clearInterval(check);
+                window.location.href = 'resultados.html'; // <--- FIN DEL JUEGO
+            } else if (data.rondaActual > parseInt(rondaActual)) {
+                clearInterval(check);
+                localStorage.setItem('idCadena', data.idCadena);
+                localStorage.setItem('rondaActual', data.rondaActual);
+                
+                if (data.accion === 'ESCRIBIR') {
+                    localStorage.setItem('imagenAnterior', data.contenidoAnterior);
+                    window.location.href = 'phrase.html'; // Toca describir
+                }
+            }
+        }, 2000);
+
+    } catch(e) {
+        document.getElementById('done-msg').textContent = "Error de conexión al guardar.";
+    }
 }
 
 document.getElementById('btn-listo').addEventListener('click', () => {

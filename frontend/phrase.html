@@ -3,46 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cháchara - Escribe una frase</title>
+    <title>Cháchara - Escribe</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .game-wrapper {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; padding: 20px; box-sizing: border-box; text-align: center;
-        }
-        .header-title { color: var(--btn-yellow); font-size: 2.5rem; text-shadow: 3px 3px 0 #000; margin-bottom: 10px; }
-        .prompt-instruction { color: #fff; font-size: 1.3rem; text-shadow: 1px 1px 0 #000; margin-bottom: 30px; }
-        
-        .input-card {
-            background: #fffef0; border: 5px solid #000; border-radius: 20px;
-            padding: 30px; width: 100%; max-width: 500px; box-shadow: 0 8px 0 rgba(0,0,0,0.25);
-            margin-bottom: 30px;
-        }
-        .phrase-input {
-            width: 100%; padding: 15px; font-size: 1.5rem; border: 3px solid #000;
-            border-radius: 12px; box-sizing: border-box; font-family: 'Fredoka', sans-serif;
-            text-align: center; margin-bottom: 20px;
-        }
-        
-        #timer-circle {
-            width: 80px; height: 80px; border-radius: 50%; border: 5px solid #000;
-            background: #bbf7d0; display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; font-weight: bold; color: #14532d; box-shadow: 0 4px 0 rgba(0,0,0,0.25);
-            margin: 0 auto 20px auto; transition: background 0.3s;
-        }
-        #timer-circle.danger { background: #fecaca; color: #7f1d1d; animation: pulse 0.5s infinite alternate; }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .game-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; text-align: center;}
+        h1 { color: var(--btn-yellow); font-size: 2.5rem; text-shadow: 3px 3px 0 #000; }
+        .input-card { background: #fffef0; border: 5px solid #000; border-radius: 20px; padding: 30px; width: 100%; max-width: 500px; box-shadow: 0 8px 0 rgba(0,0,0,0.25); }
+        .phrase-input { width: 100%; padding: 15px; font-size: 1.5rem; border: 3px solid #000; border-radius: 12px; box-sizing: border-box; font-family: 'Fredoka', sans-serif; text-align: center; margin-bottom: 20px; }
+        #timer-circle { width: 80px; height: 80px; border-radius: 50%; border: 5px solid #000; background: #bbf7d0; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 0 auto 20px; }
+        #waiting-msg { display: none; font-size: 1.5rem; color: #1e3a8a; font-weight: bold;}
     </style>
 </head>
 <body>
     <div class="game-wrapper">
-        <h1 class="header-title">¡Es hora de escribir!</h1>
-        <p class="prompt-instruction">Escribe una situación divertida, rara o loca para que alguien más la dibuje.</p>
+        <h1 id="titulo">¡Describe la situación!</h1>
+        <div id="imagen-previa" style="display:none; margin-bottom:15px;">
+            <img id="img-a-describir" src="" style="max-width:300px; border:4px solid #000; border-radius:15px;">
+        </div>
         
         <div class="input-card">
             <div id="timer-circle">40</div>
-            <input type="text" id="phrase-input" class="phrase-input" placeholder="Ej: Un dinosaurio tomando café..." maxlength="60" autocomplete="off">
-            <button id="btn-enviar-frase">¡LISTO!</button>
+            <input type="text" id="phrase-input" class="phrase-input" placeholder="Ej: Un perro alienígena...">
+            <button id="btn-enviar">¡LISTO!</button>
+            <p id="waiting-msg">Esperando a los demás jugadores...</p>
         </div>
     </div>
 
@@ -51,45 +34,84 @@
         const idSala = localStorage.getItem('idSala');
         const idJugador = localStorage.getItem('idJugador');
         
-        if(!idSala || !idJugador) window.location.href = 'index.html';
+        // Cargar contexto (Si venimos de dibujar, mostrar la imagen)
+        const imagenAnterior = localStorage.getItem('imagenAnterior');
+        if(imagenAnterior) {
+            document.getElementById('titulo').textContent = '¿Qué significa este dibujo?';
+            document.getElementById('imagen-previa').style.display = 'block';
+            document.getElementById('img-a-describir').src = imagenAnterior;
+        }
 
         let timeLeft = 40;
+        let idCadenaActual = localStorage.getItem('idCadena');
+        let rondaActual = parseInt(localStorage.getItem('rondaActual') || "1");
+        
         const timerEl = document.getElementById('timer-circle');
         const inputEl = document.getElementById('phrase-input');
-        const btnEnviar = document.getElementById('btn-enviar-frase');
+        const btnEnviar = document.getElementById('btn-enviar');
+
+        // Buscar qué cadena nos toca si es la primera ronda
+        if (rondaActual === 1) {
+            fetch(`${API_URL}/juego/${idSala}/turno/${idJugador}`)
+                .then(res => res.json())
+                .then(data => { idCadenaActual = data.idCadena; localStorage.setItem('idCadena', data.idCadena); });
+        }
 
         const countdown = setInterval(() => {
             timeLeft--;
             timerEl.textContent = timeLeft;
-            if(timeLeft <= 10) timerEl.classList.add('danger');
-            
-            if(timeLeft <= 0) {
-                clearInterval(countdown);
-                enviarFrase();
-            }
+            if(timeLeft <= 0) { clearInterval(countdown); enviarFrase(); }
         }, 1000);
 
-        btnEnviar.addEventListener('click', () => {
-            clearInterval(countdown);
-            enviarFrase();
-        });
+        btnEnviar.addEventListener('click', () => { clearInterval(countdown); enviarFrase(); });
 
         async function enviarFrase() {
-            btnEnviar.disabled = true;
-            inputEl.disabled = true;
-            let frase = inputEl.value.trim();
-            if(!frase) frase = "Algo aburrido porque no escribí nada";
+            btnEnviar.style.display = 'none';
+            inputEl.style.display = 'none';
+            timerEl.style.display = 'none';
+            document.getElementById('waiting-msg').style.display = 'block';
 
-            btnEnviar.textContent = "Guardando...";
+            let frase = inputEl.value.trim() || "Algo aburrido porque se me acabó el tiempo";
 
-            // AQUÍ LLAMARÁN A SU BACKEND PARA CREAR EL PASO (TIPO: TEXTO)
-            // Ejemplo de body para su tabla pasos_cadena:
-            // { idCadena: "uuid...", idJugador: idJugador, tipo: "TEXTO", contenido: frase, ordenRonda: 1 }
+            // Guardar en backend
+            await fetch(`${API_URL}/juego/paso`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    idCadena: idCadenaActual,
+                    idJugador: idJugador,
+                    tipo: 'TEXTO',
+                    contenido: frase,
+                    ordenRonda: rondaActual
+                })
+            });
 
-            setTimeout(() => {
-                // Simulación: redirigir a la pantalla de dibujo (esperando al backend real)
-                window.location.href = `drawing.html?prompt=${encodeURIComponent(frase)}`;
-            }, 1000);
+            esperarSiguienteTurno();
+        }
+
+        function esperarSiguienteTurno() {
+            const check = setInterval(async () => {
+                const res = await fetch(`${API_URL}/juego/${idSala}/turno/${idJugador}`);
+                const data = await res.json();
+
+                if (data.juegoTerminado) {
+                    clearInterval(check);
+                    window.location.href = 'resultados.html'; // <--- REDIRIGE A RESULTADOS AL FINAL
+                } else if (data.rondaActual > rondaActual) {
+                    clearInterval(check);
+                    localStorage.setItem('idCadena', data.idCadena);
+                    localStorage.setItem('rondaActual', data.rondaActual);
+                    localStorage.removeItem('imagenAnterior');
+                    
+                    if (data.accion === 'DIBUJAR') {
+                        localStorage.setItem('promptAnterior', data.contenidoAnterior);
+                        window.location.href = 'drawing.html'; // Toca dibujar
+                    } else {
+                        localStorage.setItem('imagenAnterior', data.contenidoAnterior);
+                        window.location.reload(); // Nos toca escribir otra vez (raro en gartic, pero por si acaso)
+                    }
+                }
+            }, 2000);
         }
     </script>
 </body>

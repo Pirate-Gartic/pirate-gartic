@@ -426,6 +426,7 @@
 
         // ── Polling: actualizar sala cada 2 segundos ──
         let pollInterval;
+        let navegandoAlJuego = false; // <--- NUEVA BANDERA
 
         async function actualizarSala() {
             try {
@@ -449,6 +450,7 @@
                 // Si el juego ya inició, redirigir a todos los jugadores
                 if (data.estado === 'JUGANDO') {
                     clearInterval(pollInterval);
+                    navegandoAlJuego = true; // <--- EVITA QUE SE BORRE EL JUGADOR AL CAMBIAR DE PANTALLA
                     window.location.href = 'phrase.html';
                     return;
                 }
@@ -480,13 +482,10 @@
             btnJugar.disabled = true;
             btnJugar.textContent = '⏳ Iniciando...';
             try {
-                const resp = await fetch(`${API_URL}/salas/${codigo}/iniciar`, { method: 'PUT' });
-                if (!resp.ok) {
-                    btnJugar.disabled = false;
-                    btnJugar.textContent = '▶ JUGAR';
-                    alert('No se pudo iniciar el juego.');
-                }
-                // Si fue exitoso, el próximo poll detectará "JUGANDO" y redirigirá a todos
+                const idSala = localStorage.getItem('idSala');
+                // IMPORTANTE: Llamar al NUEVO endpoint que crea las cadenas
+                const resp = await fetch(`${API_URL}/juego/${idSala}/iniciar`, { method: 'POST' });
+                if (!resp.ok) throw new Error("Error al iniciar");
             } catch (err) {
                 btnJugar.disabled = false;
                 btnJugar.textContent = '▶ JUGAR';
@@ -516,17 +515,11 @@
             localStorage.removeItem('esHost');
         }
 
-        // ── Al cerrar el tab/ventana, eliminar al jugador de la sala ──
-        // Esto aplica tanto a invitados como a usuarios registrados,
-        // ya que "jugadores" es una tabla de sesión, no permanente.
+        // ── Al cerrar el tab/ventana ──
         window.addEventListener('beforeunload', () => {
-            if (idJugador) {
-                // keepalive:true es clave para que la request llegue al backend
-                // aunque la página se esté cerrando
-                fetch(`${API_URL}/jugadores/${idJugador}`, {
-                    method: 'DELETE',
-                    keepalive: true
-                });
+            // SOLO BORRAR SI NO ESTAMOS ENTRANDO AL JUEGO
+            if (idJugador && !navegandoAlJuego) {
+                fetch(`${API_URL}/jugadores/${idJugador}`, { method: 'DELETE', keepalive: true });
             }
         });
     </script>
