@@ -26,7 +26,7 @@ public class DibujoService {
 
     private final DynamoDbClient dynamoDB;
 
-    @Value("${aws.dynamo.table.dibujos:chachara-dibujos}")
+    @Value("${aws.dynamo.table.dibujos:chachara-dibujo}")
     private String tableName;
 
     @Autowired

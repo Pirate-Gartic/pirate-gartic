@@ -110,8 +110,11 @@
                     localStorage.setItem('idCadena', data.idCadena);
                     localStorage.setItem('rondaActual', data.rondaActual);
                     localStorage.removeItem('imagenAnterior');
-                    
-                    if (data.accion === 'DIBUJAR') {
+
+                    if (rondaActual === 1) {
+                        localStorage.setItem('promptAnterior', data.contenidoAnterior);
+                        window.location.href = 'drawing.html'; // Toca dibujar
+                    } else if (data.accion === 'DIBUJAR') {
                         localStorage.setItem('promptAnterior', data.contenidoAnterior);
                         window.location.href = 'drawing.html'; // Toca dibujar
                     } else {
