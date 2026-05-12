@@ -87,3 +87,4 @@ El frontend automaticamente se conectará con el backend y levantará un servido
 --- 
 ## Enlaces externos
 - **Wireframe Figma:** https://www.figma.com/design/OxoXIyyLhqYFzbslmWAqEf/Wireframes-chachara?m=auto&t=ZrASgsQhgq7emuHd-6
+- **User flow:** https://lucid.app/lucidspark/f770330c-74fe-45ab-ae56-4fd0b48eeaca/edit?viewport_loc=-2844%2C-1076%2C6615%2C4122%2C0_0&invitationId=inv_e035d2b7-28af-4bc3-89fa-0bb86ce8955e
