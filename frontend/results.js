@@ -32,16 +32,22 @@ if (esHost === 'true') {
 
 // Lógica: JUGAR DE NUEVO (Reciclar Sala)
 btnJugarNuevo.addEventListener('click', async () => {
-    try {
-        // Le decimos a Spring Boot que aniquile los dibujos viejos
-        await fetch(`http://localhost:8080/api/salas/${idSala}/reiniciar`, { method: 'PUT' });
-        // Volvemos al lobby sin disparar el pagehide
-        irAPantalla('lobby.html'); 
-    } catch (error) {
-        alert("Error al reiniciar la partida.");
-    }
-});
-
+            try {
+                // Le decimos a Spring Boot que aniquile los dibujos viejos
+                await fetch(`http://localhost:8080/api/salas/${idSala}/reiniciar`, { method: 'PUT' });
+                
+                //Limpiar la basura antes de ir al lobby
+                localStorage.removeItem('idCadena');
+                localStorage.removeItem('rondaActual');
+                localStorage.removeItem('imagenAnterior');
+                localStorage.removeItem('promptAnterior');
+                
+                // Volvemos al lobby sin disparar el pagehide
+                irAPantalla('lobby.html'); 
+            } catch (error) {
+                alert("Error al reiniciar la partida.");
+            }
+        });
 // Lógica: SALIR AL INICIO (Kahoot Style)
 btnSalir.addEventListener('click', async () => {
     // Si el host le da a salir, destruimos la sala en la BD
@@ -130,8 +136,14 @@ if (esHost !== 'true') {
                 const data = await resp.json();
                 // ¡El host reinició la sala! Nos vamos todos al lobby automáticamente
                 if (data.estado === 'ESPERANDO') {
-                    irAPantalla('lobby.html');
-                }
+                            // Limpiar la basura del invitado
+                            localStorage.removeItem('idCadena');
+                            localStorage.removeItem('rondaActual');
+                            localStorage.removeItem('imagenAnterior');
+                            localStorage.removeItem('promptAnterior');
+                            
+                            irAPantalla('lobby.html');
+                        }
             } else if (resp.status === 404) {
                 // El host le dio a "Salir al inicio" y destruyó la sala. Nos saca a todos.
                 localStorage.clear();
