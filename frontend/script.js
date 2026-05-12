@@ -203,6 +203,11 @@ function guardarSesion(codigo, idJugador, idSala, esHost, isGuest, username, ava
     localStorage.setItem('isGuest', isGuest ? 'true' : 'false');
     localStorage.setItem('username', username);
     localStorage.setItem('avatarPath', avatarPath);
+      // 🔥 AGREGAR ESTO: Limpiar la basura de juegos anteriores
+    localStorage.removeItem('idCadena');
+    localStorage.removeItem('rondaActual');
+    localStorage.removeItem('imagenAnterior');
+    localStorage.removeItem('promptAnterior');
 }
 
 // Si la URL trae un ?join=CODIGO, abrir la pestaña Unirse automáticamente
