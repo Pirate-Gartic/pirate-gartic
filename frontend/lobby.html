@@ -431,9 +431,16 @@
             try {
                 const resp = await fetch(`${API_URL}/salas/${codigo}`);
 
+                if (resp.status === 404) {
+                    alert("El anfitrión ha cerrado la sala.");
+                    clearInterval(pollInterval);
+                    localStorage.clear(); // Limpiar sesión
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
                 if (!resp.ok) {
-                    document.getElementById('status-msg').textContent =
-                        'No se pudo conectar con la sala. ¿El backend está corriendo?';
+                    document.getElementById('status-msg').textContent = 'Error de conexión. Reintentando...';
                     return;
                 }
 
