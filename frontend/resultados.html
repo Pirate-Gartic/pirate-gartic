@@ -51,6 +51,15 @@
         </div>
     </div>
 
+    <div class="botones-container">
+            <button id="btn-jugar-nuevo" class="btn-volver" style="display: none;">JUGAR DE NUEVO</button>
+            <button id="btn-volver" class="btn-volver">SALIR AL INICIO</button>
+        </div>
+        
+        <h3 id="msg-esperando" style="color: white; text-align: center; display: none; margin-top: 20px;">
+            ⏳ Esperando a que el Host inicie otra ronda...
+        </h3>
+
     <script>
         const API_URL = 'http://localhost:8080/api';
         const idSala = localStorage.getItem('idSala');
