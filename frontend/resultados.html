@@ -7,12 +7,19 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body { overflow-y: auto; align-items: flex-start; padding: 40px 20px; }
-        .results-container { width: 100%; max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+        .results-container { 
+            width: 100%; max-width: 700px; margin: 0 auto; 
+            display: flex; flex-direction: column; gap: 40px; 
+            align-items: center; /* Asegura que todo el contenido esté centrado */
+        }
         h1 { color: var(--btn-yellow); font-size: 3rem; text-shadow: 4px 4px 0 #000; text-align: center; margin-bottom: 10px; }
         
+        #cadenas-wrapper { width: 100%; }
+
         .cadena-card {
             background: var(--card-blue); border: 6px solid #000; border-radius: 25px;
             padding: 30px; box-shadow: 0 10px 0 var(--card-border), 0 10px 0 6px #000;
+            width: 100%; box-sizing: border-box;
         }
         .cadena-title {
             color: #fff; font-size: 1.5rem; text-align: center; text-shadow: 2px 2px 0 #000;
@@ -31,7 +38,11 @@
         .paso-texto { font-size: 1.6rem; color: #1e3a8a; font-weight: bold; margin: 20px 0 0 0; }
         .paso-dibujo { width: 100%; max-width: 400px; border: 3px solid #000; border-radius: 10px; margin-top: 15px; background: #fff;}
         
-        .botones-container { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; margin: 0 auto; }
+        .botones-container { 
+            display: flex; flex-direction: column; gap: 15px; 
+            width: 100%; max-width: 300px; margin: 0 auto; 
+            align-items: center; /* Centra los botones en sí mismos */
+        }
         .btn-volver { font-size: 1.5rem; width: 100%; }
         /* Color especial para que destaque el de jugar de nuevo */
         #btn-jugar-nuevo { background-color: #4ade80; } 
@@ -49,16 +60,11 @@
             <button id="btn-jugar-nuevo" class="btn-volver" style="display: none;">JUGAR DE NUEVO</button>
             <button id="btn-volver" class="btn-volver">SALIR AL INICIO</button>
         </div>
-    </div>
-
-    <div class="botones-container">
-            <button id="btn-jugar-nuevo" class="btn-volver" style="display: none;">JUGAR DE NUEVO</button>
-            <button id="btn-volver" class="btn-volver">SALIR AL INICIO</button>
-        </div>
         
-        <h3 id="msg-esperando" style="color: white; text-align: center; display: none; margin-top: 20px;">
+        <h3 id="msg-esperando" style="color: white; text-align: center; display: none; margin-top: 10px;">
             ⏳ Esperando a que el Host inicie otra ronda...
         </h3>
+    </div>
 
     <script>
         const API_URL = 'http://localhost:8080/api';
@@ -176,6 +182,9 @@
 
         cargarResultados();
 
+        // ==========================================
+        //  RADAR PARA INVITADOS (Polling)
+        // ==========================================
         if (esHost !== 'true') {
             // Mostrarle al invitado que estamos esperando al jefe
             document.getElementById('msg-esperando').style.display = 'block';
@@ -202,7 +211,6 @@
                 }
             }, 3000); // 3000 ms = 3 segundos
         }
-        
     </script>
 </body>
 </html>
