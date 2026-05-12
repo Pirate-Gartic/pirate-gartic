@@ -23,4 +23,6 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation platform('software.amazon.awssdk:bom:2.20.0')
+    implementation 'software.amazon.awssdk:dynamodb'
 }
