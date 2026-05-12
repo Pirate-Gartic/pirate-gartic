@@ -175,6 +175,34 @@
         }
 
         cargarResultados();
+
+        if (esHost !== 'true') {
+            // Mostrarle al invitado que estamos esperando al jefe
+            document.getElementById('msg-esperando').style.display = 'block';
+
+            // Checar cada 3 segundos qué está haciendo el Host
+            setInterval(async () => {
+                try {
+                    const codigoSala = localStorage.getItem('codigoSala');
+                    const resp = await fetch(`http://localhost:8080/api/salas/${codigoSala}`);
+                    
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        // ¡El host reinició la sala! Nos vamos todos al lobby automáticamente
+                        if (data.estado === 'ESPERANDO') {
+                            irAPantalla('lobby.html');
+                        }
+                    } else if (resp.status === 404) {
+                        // El host le dio a "Salir al inicio" y destruyó la sala. Nos saca a todos.
+                        localStorage.clear();
+                        irAPantalla('index.html');
+                    }
+                } catch (error) {
+                    console.log("Buscando señal del host...");
+                }
+            }, 3000); // 3000 ms = 3 segundos
+        }
+        
     </script>
 </body>
 </html>
