@@ -466,11 +466,11 @@ async function lockCanvas(timedOut = false) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                idCadena: idCadena,
-                idJugador: idJugador,
+                idCadena: String(idCadena),
+                idJugador: String(idJugador),
                 tipo: 'DIBUJO',
-                contenido: dynamoKey,
-                ordenRonda: rondaActual
+                contenido: String(dynamoKey), // la clave que te regresó Dynamo
+                ordenRonda: String(rondaActual) // <--- Forzamos a String
             })
         });
 

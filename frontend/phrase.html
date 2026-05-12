@@ -73,16 +73,24 @@
 
             let frase = inputEl.value.trim() || "Algo aburrido porque se me acabó el tiempo";
 
-            // Guardar en backend
+            // Nos aseguramos de tener la cadena (por si el jugador le dio click rapidísimo)
+            if (!idCadenaActual) {
+                const res = await fetch(`${API_URL}/juego/${idSala}/turno/${idJugador}`);
+                const data = await res.json();
+                idCadenaActual = data.idCadena;
+                localStorage.setItem('idCadena', idCadenaActual);
+            }
+
+            // Guardar en backend asegurándonos de que TODO sea String
             await fetch(`${API_URL}/juego/paso`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    idCadena: idCadenaActual,
-                    idJugador: idJugador,
+                    idCadena: String(idCadenaActual),
+                    idJugador: String(idJugador),
                     tipo: 'TEXTO',
                     contenido: frase,
-                    ordenRonda: rondaActual
+                    ordenRonda: String(rondaActual) // <--- Aquí estaba el problema principal
                 })
             });
 
