@@ -18,6 +18,9 @@ public class SalaController {
     @Autowired
     private JugadorRepository jugadorRepo;
 
+    @Autowired
+    private CadenaRepository cadenaRepo; // INYECTADO PARA REINICIAR PARTIDAS
+
     // ── Utilidad: código de 6 caracteres único ──
     private String generarCodigoUnico() {
         String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sin O, 0, I, 1 para evitar confusiones
@@ -43,9 +46,6 @@ public class SalaController {
 
     // ────────────────────────────────────────────────────────
     //  POST /api/salas/crear
-    //  Crea una sala nueva y registra al creador como host.
-    //  Body: { nickname, avatarUrl, idCuenta? }
-    //  Responde: { codigoAcceso, idJugador, idSala }
     // ────────────────────────────────────────────────────────
     @PostMapping("/salas/crear")
     public ResponseEntity<?> crearSala(@RequestBody Map<String, String> body) {
@@ -81,9 +81,6 @@ public class SalaController {
 
     // ────────────────────────────────────────────────────────
     //  POST /api/salas/{codigo}/unirse
-    //  Registra a un jugador en una sala existente.
-    //  Body: { nickname, avatarUrl, idCuenta? }
-    //  Responde: { idJugador, idSala }
     // ────────────────────────────────────────────────────────
     @PostMapping("/salas/{codigo}/unirse")
     public ResponseEntity<?> unirseASala(
@@ -129,8 +126,6 @@ public class SalaController {
 
     // ────────────────────────────────────────────────────────
     //  GET /api/salas/{codigo}
-    //  Devuelve el estado de la sala y la lista de jugadores.
-    //  Usado para el polling de lobby.html.
     // ────────────────────────────────────────────────────────
     @GetMapping("/salas/{codigo}")
     public ResponseEntity<?> obtenerSala(@PathVariable String codigo) {
@@ -149,8 +144,6 @@ public class SalaController {
 
     // ────────────────────────────────────────────────────────
     //  PUT /api/salas/{codigo}/iniciar
-    //  Cambia el estado de la sala a JUGANDO (solo el host lo llama).
-    //  Todos los clientes en lobby.html detectarán el cambio via polling.
     // ────────────────────────────────────────────────────────
     @PutMapping("/salas/{codigo}/iniciar")
     public ResponseEntity<?> iniciarSala(@PathVariable String codigo) {
@@ -164,10 +157,31 @@ public class SalaController {
     }
 
     // ────────────────────────────────────────────────────────
+    //  PUT /api/salas/{idSala}/reiniciar (NUEVO PARA REJUGAR)
+    // ────────────────────────────────────────────────────────
+    @PutMapping("/salas/{idSala}/reiniciar")
+    public ResponseEntity<?> reiniciarSala(@PathVariable UUID idSala) {
+        return salaRepo.findById(idSala).map(sala -> {
+            sala.setEstado("ESPERANDO"); 
+            salaRepo.save(sala);
+            cadenaRepo.vaciarCadenasPorSala(idSala); // Limpia frases y dibujos
+            return ResponseEntity.ok().body(Map.of("mensaje", "Sala reiniciada exitosamente"));
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // ────────────────────────────────────────────────────────
+    //  DELETE /api/salas/{id} (NUEVO PARA DESTRUIR SALA AL CERRAR PESTAÑA)
+    // ────────────────────────────────────────────────────────
+    @DeleteMapping("/salas/{id}")
+    public ResponseEntity<Void> eliminarSala(@PathVariable UUID id) {
+        if (salaRepo.existsById(id)) {
+            salaRepo.deleteById(id);
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    // ────────────────────────────────────────────────────────
     //  DELETE /api/jugadores/{id}
-    //  Elimina un jugador de su sala.
-    //  Llamado cuando el usuario cierra el navegador o hace clic en Salir.
-    //  Para invitados, esto borra su registro temporal de la BD.
     // ────────────────────────────────────────────────────────
     @DeleteMapping("/jugadores/{id}")
     public ResponseEntity<?> eliminarJugador(@PathVariable UUID id) {
@@ -176,8 +190,6 @@ public class SalaController {
         
         Jugador jugador = jugOpt.get();
         if (jugador.getEsHost()) {
-            // Si el host se va, eliminamos la sala completa. 
-            // La BD se encarga de eliminar en cascada a los demás jugadores y cadenas.
             salaRepo.deleteById(jugador.getIdSala());
             return ResponseEntity.ok("El host salió. Sala eliminada.");
         } else {

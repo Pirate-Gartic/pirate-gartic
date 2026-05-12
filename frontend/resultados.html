@@ -31,9 +31,10 @@
         .paso-texto { font-size: 1.6rem; color: #1e3a8a; font-weight: bold; margin: 20px 0 0 0; }
         .paso-dibujo { width: 100%; max-width: 400px; border: 3px solid #000; border-radius: 10px; margin-top: 15px; background: #fff;}
         
-        .btn-volver {
-            width: 100%; max-width: 300px; margin: 0 auto; display: block; font-size: 1.5rem;
-        }
+        .botones-container { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; margin: 0 auto; }
+        .btn-volver { font-size: 1.5rem; width: 100%; }
+        /* Color especial para que destaque el de jugar de nuevo */
+        #btn-jugar-nuevo { background-color: #4ade80; } 
     </style>
 </head>
 <body>
@@ -43,20 +44,78 @@
         <div id="cadenas-wrapper">
             <h2 style="color: white; text-align:center;">Cargando los chismes...</h2>
         </div>
-        <button id="btn-volver" class="btn-volver">VOLVER AL INICIO</button>
+        
+        <div class="botones-container">
+            <button id="btn-jugar-nuevo" class="btn-volver" style="display: none;">JUGAR DE NUEVO</button>
+            <button id="btn-volver" class="btn-volver">SALIR AL INICIO</button>
+        </div>
     </div>
 
     <script>
         const API_URL = 'http://localhost:8080/api';
         const idSala = localStorage.getItem('idSala');
+        const esHost = localStorage.getItem('esHost');
         
         if(!idSala) window.location.href = 'index.html';
 
-        document.getElementById('btn-volver').addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'index.html';
+        // ==========================================
+        //  ESCUDO ANTI-BORRADO DE SALAS
+        // ==========================================
+        let navegacionInterna = false;
+        function irAPantalla(url) {
+            navegacionInterna = true;
+            window.location.href = url;
+        }
+
+        window.addEventListener('pagehide', () => {
+            if (!navegacionInterna && idSala && esHost === 'true') {
+                fetch(`http://localhost:8080/api/salas/${idSala}`, { method: 'DELETE', keepalive: true });
+            }
         });
 
+        // ==========================================
+        //  BOTONES
+        // ==========================================
+        const btnJugarNuevo = document.getElementById('btn-jugar-nuevo');
+        const btnSalir = document.getElementById('btn-volver');
+
+        // Mostrar botón de reiniciar solo si es el host
+        if (esHost === 'true') {
+            btnJugarNuevo.style.display = 'block';
+        }
+
+        // Lógica: JUGAR DE NUEVO (Reciclar Sala)
+        btnJugarNuevo.addEventListener('click', async () => {
+            try {
+                // Le decimos a Spring Boot que aniquile los dibujos viejos
+                await fetch(`http://localhost:8080/api/salas/${idSala}/reiniciar`, { method: 'PUT' });
+                // Volvemos al lobby sin disparar el pagehide
+                irAPantalla('lobby.html'); 
+            } catch (error) {
+                alert("Error al reiniciar la partida.");
+            }
+        });
+
+        // Lógica: SALIR AL INICIO (Kahoot Style)
+        btnSalir.addEventListener('click', async () => {
+            // Si el host le da a salir, destruimos la sala en la BD
+            if (esHost === 'true') {
+                await fetch(`http://localhost:8080/api/salas/${idSala}`, { method: 'DELETE' });
+            } else {
+                // Si es un jugador normal, lo eliminamos de la sala
+                const idJugador = localStorage.getItem('idJugador');
+                if (idJugador) {
+                    await fetch(`http://localhost:8080/api/jugadores/${idJugador}`, { method: 'DELETE' });
+                }
+            }
+            
+            localStorage.clear();
+            irAPantalla('index.html');
+        });
+
+        // ==========================================
+        //  CARGA DE DIBUJOS Y FRASES
+        // ==========================================
         async function cargarResultados() {
             try {
                 const resp = await fetch(`${API_URL}/juego/${idSala}/resultados`);
@@ -92,7 +151,7 @@
                         } else if (paso.tipo === 'DIBUJO') {
                             const img = document.createElement('img');
                             img.className = 'paso-dibujo';
-                            img.src = paso.contenido; // Ya viene armado desde el backend con base64 y DynamoDB
+                            img.src = paso.contenido; 
                             divPaso.appendChild(img);
                         }
                         card.appendChild(divPaso);
@@ -102,7 +161,7 @@
                 });
 
             } catch (error) {
-                document.getElementById('cadenas-wrapper').innerHTML = '<h2 style="color:white; text-align:center;">Hubo un problema recuperando las imágenes de DynamoDB.</h2>';
+                document.getElementById('cadenas-wrapper').innerHTML = '<h2 style="color:white; text-align:center;">Hubo un problema recuperando las imágenes.</h2>';
             }
         }
 

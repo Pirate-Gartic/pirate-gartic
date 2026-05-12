@@ -1,4 +1,26 @@
 // =============================================================
+//  NAVEGACIÓN SEGURA Y AUTODESTRUCCIÓN DE SALA
+// =============================================================
+window.navegacionInterna = false;
+
+function irAPantalla(url) {
+    window.navegacionInterna = true;
+    window.location.href = url;
+}
+
+window.addEventListener('pagehide', () => {
+    const idSala = localStorage.getItem('idSala');
+    const esHost = localStorage.getItem('esHost'); 
+    // Si NO es navegación interna (es decir, el usuario cerró la pestaña/navegador) y es el HOST
+    if (!window.navegacionInterna && idSala && esHost === 'true') {
+        fetch(`http://localhost:8080/api/salas/${idSala}`, { 
+            method: 'DELETE', 
+            keepalive: true 
+        });
+    }
+});
+
+// =============================================================
 //  CONFIGURACIÓN DE AVATARES
 // =============================================================
 const AVATARES = [
@@ -10,7 +32,6 @@ const AVATARES = [
 const AVATAR_DEFAULT = AVATARES[0];
 const AVATAR_FOLDER = "assets/avatars/";
 
-// Variables de estado para los avatares elegidos en cada vista
 let crearAvatarPath = AVATAR_DEFAULT;
 let unirseAvatarPath = AVATAR_DEFAULT;
 let regAvatarPath = AVATAR_DEFAULT;
@@ -28,11 +49,8 @@ function validarContrasena(contrasena) { return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)
 //  Gestión de Interfaz (Pestañas y Subvistas)
 // =============================================================
 function switchTab(tabId) {
-    // Quitar 'active' de todos los tabs y contenidos
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    
-    // Activar el seleccionado
     document.querySelector(`button[onclick="switchTab('${tabId}')"]`).classList.add('active');
     document.getElementById(tabId).classList.add('active');
 }
@@ -42,7 +60,6 @@ function switchSubView(hideId, showId) {
     document.getElementById(showId).classList.remove('hidden');
 }
 
-// Inicializar pickers de avatares
 document.addEventListener('DOMContentLoaded', () => {
     buildAvatarPicker(document.getElementById('crear-avatar-picker'), document.getElementById('crear-avatar-display'), (p) => { crearAvatarPath = p; });
     buildAvatarPicker(document.getElementById('unirse-avatar-picker'), document.getElementById('unirse-avatar-display'), (p) => { unirseAvatarPath = p; });
@@ -74,15 +91,12 @@ function setAvatarPreview(previewEl, path) {
 // =============================================================
 //  LÓGICA: CREAR SALA
 // =============================================================
-
-// Crear como Invitado
 document.getElementById('btn-crear-sala').addEventListener('click', async () => {
     const nickname = document.getElementById('crear-username').value.trim();
     if (!nickname) return alert("Escribe un apodo.");
     await procesarCrearSala(nickname, crearAvatarPath, null, true);
 });
 
-// Crear con Login
 document.getElementById('btn-crear-login').addEventListener('click', async () => {
     const email = document.getElementById('crear-login-email').value.trim();
     const pass = document.getElementById('crear-login-pass').value.trim();
@@ -102,16 +116,14 @@ async function procesarCrearSala(nickname, avatarUrl, idCuenta, isGuest) {
         
         const data = await resp.json();
         guardarSesion(data.codigoAcceso, data.idJugador, data.idSala, true, isGuest, nickname, avatarUrl);
-        window.location.href = 'lobby.html';
+        // NUEVO: Usamos irAPantalla para no borrar la sala accidentalmente
+        irAPantalla('lobby.html');
     } catch (e) { alert("Error de conexión con el backend."); }
 }
-
 
 // =============================================================
 //  LÓGICA: UNIRSE A SALA
 // =============================================================
-
-// Unirse como Invitado
 document.getElementById('btn-unirse-sala').addEventListener('click', async () => {
     const codigo = document.getElementById('unirse-codigo').value.trim().toUpperCase();
     const nickname = document.getElementById('unirse-username').value.trim();
@@ -119,7 +131,6 @@ document.getElementById('btn-unirse-sala').addEventListener('click', async () =>
     await procesarUnirseSala(codigo, nickname, unirseAvatarPath, null, true);
 });
 
-// Unirse con Login
 document.getElementById('btn-unirse-login').addEventListener('click', async () => {
     const codigo = document.getElementById('unirse-codigo').value.trim().toUpperCase();
     const email = document.getElementById('unirse-login-email').value.trim();
@@ -136,19 +147,18 @@ async function procesarUnirseSala(codigo, nickname, avatarUrl, idCuenta, isGuest
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nickname, avatarUrl, idCuenta: idCuenta || '' })
         });
-        
-        if (!resp.ok) return alert(await resp.text()); // Muestra error si la sala está llena, no existe o el apodo ya se usa
+        if (!resp.ok) return alert(await resp.text()); 
         
         const data = await resp.json();
         guardarSesion(codigo, data.idJugador, data.idSala, false, isGuest, nickname, avatarUrl);
-        window.location.href = 'lobby.html';
+        // NUEVO: Usamos irAPantalla
+        irAPantalla('lobby.html');
     } catch (e) { alert("Error de conexión con el backend."); }
 }
 
 // =============================================================
 //  FUNCIONES AUXILIARES (Login, Registro y Sesión)
 // =============================================================
-
 async function realizarLogin(email, contrasena) {
     try {
         const response = await fetch(API_URL + '/login', {
@@ -173,7 +183,6 @@ async function realizarLogin(email, contrasena) {
     }
 }
 
-// Registro
 document.getElementById('btn-register').addEventListener('click', async () => {
     const username = document.getElementById('reg-username').value.trim();
     const email = document.getElementById('reg-email').value.trim();
@@ -203,14 +212,13 @@ function guardarSesion(codigo, idJugador, idSala, esHost, isGuest, username, ava
     localStorage.setItem('isGuest', isGuest ? 'true' : 'false');
     localStorage.setItem('username', username);
     localStorage.setItem('avatarPath', avatarPath);
-      // 🔥 AGREGAR ESTO: Limpiar la basura de juegos anteriores
+    // Limpieza de basura
     localStorage.removeItem('idCadena');
     localStorage.removeItem('rondaActual');
     localStorage.removeItem('imagenAnterior');
     localStorage.removeItem('promptAnterior');
 }
 
-// Si la URL trae un ?join=CODIGO, abrir la pestaña Unirse automáticamente
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const joinCode = urlParams.get('join');
