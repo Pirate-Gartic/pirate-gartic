@@ -171,9 +171,18 @@ public class SalaController {
     // ────────────────────────────────────────────────────────
     @DeleteMapping("/jugadores/{id}")
     public ResponseEntity<?> eliminarJugador(@PathVariable UUID id) {
-        if (!jugadorRepo.existsById(id))
-            return ResponseEntity.status(404).body("Jugador no encontrado.");
-        jugadorRepo.deleteById(id);
-        return ResponseEntity.ok("Jugador eliminado.");
+        Optional<Jugador> jugOpt = jugadorRepo.findById(id);
+        if (jugOpt.isEmpty()) return ResponseEntity.status(404).body("Jugador no encontrado.");
+        
+        Jugador jugador = jugOpt.get();
+        if (jugador.getEsHost()) {
+            // Si el host se va, eliminamos la sala completa. 
+            // La BD se encarga de eliminar en cascada a los demás jugadores y cadenas.
+            salaRepo.deleteById(jugador.getIdSala());
+            return ResponseEntity.ok("El host salió. Sala eliminada.");
+        } else {
+            jugadorRepo.deleteById(id);
+            return ResponseEntity.ok("Jugador eliminado.");
+        }
     }
 }
