@@ -1,6 +1,8 @@
 package com.opengartic;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.util.UUID;
 
 @Entity
@@ -18,10 +20,10 @@ public class PasoCadena {
     @Column(name = "id_jugador", nullable = false)
     private UUID idJugador;
 
-    // Mapea al tipo enum de PostgreSQL como String para evitar conflictos
-    // Valores válidos: "TEXTO" | "DIBUJO"
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "tipo", columnDefinition = "tipo_paso_enum", nullable = false)
-    private String tipo;
+    private TipoPaso tipo;
 
     // Para TEXTO: el texto escrito por el jugador
     // Para DIBUJO: la clave DynamoDB → formato "{idSala}/{idJugador}_{ordenRonda}"
@@ -37,14 +39,14 @@ public class PasoCadena {
     public UUID getIdPaso()       { return idPaso; }
     public UUID getIdCadena()     { return idCadena; }
     public UUID getIdJugador()    { return idJugador; }
-    public String getTipo()       { return tipo; }
+    public TipoPaso getTipo()     { return tipo; }
     public String getContenido()  { return contenido; }
     public Short getOrdenRonda()  { return ordenRonda; }
 
     // Setters
     public void setIdCadena(UUID idCadena)      { this.idCadena = idCadena; }
     public void setIdJugador(UUID idJugador)    { this.idJugador = idJugador; }
-    public void setTipo(String tipo)            { this.tipo = tipo; }
+    public void setTipo(TipoPaso tipo)          { this.tipo = tipo; }
     public void setContenido(String contenido)  { this.contenido = contenido; }
     public void setOrdenRonda(Short ordenRonda) { this.ordenRonda = ordenRonda; }
 }

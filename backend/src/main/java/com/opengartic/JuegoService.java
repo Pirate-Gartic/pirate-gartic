@@ -71,7 +71,7 @@ public class JuegoService {
             );
             if (pasoAnteriorOpt.isPresent()) {
                 PasoCadena pasoAnterior = pasoAnteriorOpt.get();
-                if ("TEXTO".equals(pasoAnterior.getTipo())) {
+                if (pasoAnterior.getTipo() == TipoPaso.TEXTO) {
                     respuesta.put("accion", "DIBUJAR");
                     respuesta.put("contenidoAnterior", pasoAnterior.getContenido()); // El texto a dibujar
                 } else {
@@ -104,7 +104,7 @@ public class JuegoService {
                 pasoMap.put("autor", autor != null ? autor.getNickname() : "Desconocido");
                 pasoMap.put("tipo", p.getTipo());
                 
-                if ("DIBUJO".equals(p.getTipo())) {
+                if (p.getTipo() == TipoPaso.DIBUJO) {
                     // Extraer mágicamente de DynamoDB
                     String base64 = dibujoService.obtenerDibujo(p.getContenido());
                     pasoMap.put("contenido", "data:image/png;base64," + base64);

@@ -39,7 +39,7 @@ public class JuegoController {
     public ResponseEntity<?> guardarPaso(@RequestBody Map<String, String> body) {
         UUID idCadena = UUID.fromString(body.get("idCadena"));
         UUID idJugador = UUID.fromString(body.get("idJugador"));
-        String tipo = body.get("tipo");
+        TipoPaso tipo = TipoPaso.valueOf(body.get("tipo"));
         String contenido = body.get("contenido");
         Short ordenRonda = Short.parseShort(body.get("ordenRonda"));
 
