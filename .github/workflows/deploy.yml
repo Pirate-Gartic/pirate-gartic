@@ -72,14 +72,17 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # 1. Tu código original:
+            # 1. Darle permisos a ec2-user para leer el archivo de Kubernetes
+            sudo chmod 644 /etc/rancher/k3s/k3s.yaml
             export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-            helm upgrade --install chachara-prod ~/deploy/charts/chachara
             
-            # 2. LO NUEVO: Instalar Cockpit:
+            # 2. Despliegue de Helm
+            helm upgrade --install chachara-prod ~/deploy/charts/chachara
+          
+            # 3. Instalar y habilitar Cockpit
             sudo dnf install cockpit -y
             sudo systemctl enable --now cockpit.socket
             
-            # 3. Abrir el firewall interno
+            # 4. Configurar firewall interno
             sudo firewall-cmd --add-port=9090/tcp --permanent
             sudo firewall-cmd --reload
