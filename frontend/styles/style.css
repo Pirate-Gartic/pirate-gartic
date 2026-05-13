@@ -1223,3 +1223,59 @@ button:active {
     font-size: 1.3rem;
     text-shadow: 1px 1px 0 #000;
 }
+
+/* ═══════════════════════════════════════════
+   ADAPTACIÓN PARA NAVEGADORES MÓVILES
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+    /* Achicar un poco el título para que no se salga */
+    .logo h1, .game-wrapper h1, .results-container h1 {
+        font-size: 2.2rem;
+    }
+
+    /* LOBBY: Pasar de 4 columnas a 2 columnas para que quepan los jugadores */
+    .players-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .players-panel {
+        padding: 15px;
+    }
+
+    /* PANTALLA DE DIBUJO: Apilar todo verticalmente */
+    #drawing-screen {
+        flex-direction: column; 
+        padding: 8px;
+    }
+
+    /* Pasar la barra de colores de la izquierda a la parte superior horizontal */
+    #left-panel {
+        width: 100%;
+        min-width: 100%;
+        flex-direction: row; 
+        padding: 8px;
+        overflow-x: auto; 
+        height: auto;
+    }
+
+    .swatches-grid {
+        display: flex; 
+        gap: 8px;
+    }
+
+    .swatch {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+    }
+
+    /* Hacer el área de herramientas más amigable para los dedos */
+    #toolbar {
+        padding: 6px;
+        gap: 5px;
+    }
+    .tool-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+}
