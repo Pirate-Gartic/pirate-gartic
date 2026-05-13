@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://api.playchachara.com/api';
 const idSala = localStorage.getItem('idSala');
 const idJugador = localStorage.getItem('idJugador');
 

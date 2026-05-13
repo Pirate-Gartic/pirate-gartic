@@ -13,7 +13,7 @@ window.addEventListener('pagehide', () => {
     const esHost = localStorage.getItem('esHost'); 
     // Si NO es navegación interna (es decir, el usuario cerró la pestaña/navegador) y es el HOST
     if (!window.navegacionInterna && idSala && esHost === 'true') {
-        fetch(`http://localhost:8080/api/salas/${idSala}`, { 
+        fetch(`https://api.playchachara.com/api/salas/${idSala}`, { 
             method: 'DELETE', 
             keepalive: true 
         });
@@ -36,8 +36,8 @@ let crearAvatarPath = AVATAR_DEFAULT;
 let unirseAvatarPath = AVATAR_DEFAULT;
 let regAvatarPath = AVATAR_DEFAULT;
 
-const API_URL = "http://localhost:8080/api/cuentas";
-const SALAS_API_URL = "http://localhost:8080/api/salas";
+const API_URL = "https://api.playchachara.com/api/cuentas";
+const SALAS_API_URL = "https://api.playchachara.com/api/salas";
 
 // =============================================================
 //  Validaciones
