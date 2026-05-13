@@ -1,0 +1,9 @@
+backend:
+  image: docker.io/tellojorge2005/chachara-backend:latest
+  replicas: 1
+  port: 8080
+
+frontend:
+  image: docker.io/tellojorge2005/chachara-frontend:latest
+  replicas: 1
+  port: 80

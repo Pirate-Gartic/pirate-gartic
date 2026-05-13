@@ -30,10 +30,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+        // Reemplazamos el "*" por dominios exactos
+        config.setAllowedOrigins(List.of(
+            "https://playchachara.com", 
+            "https://www.playchachara.com",
+            // Para seguir probando el frontend de forma local con Live Server
+            "http://127.0.0.1:5500",
+            "http://localhost:5500" 
+        ));
+        
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false);
+        
+        // True cuando se usan dominios especificos
+        config.setAllowCredentials(true); 
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

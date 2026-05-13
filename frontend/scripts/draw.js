@@ -448,7 +448,7 @@ async function lockCanvas(timedOut = false) {
 
     try {
         // 1. Subir a DynamoDB (Tu endpoint existente)
-        const respDyn = await fetch('http://localhost:8080/api/dibujos', {
+        const respDyn = await fetch('https://api.playchachara.com/api/dibujos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -462,7 +462,7 @@ async function lockCanvas(timedOut = false) {
         const dynamoKey = dataDyn.idImagen;
 
         // 2. Avisar al backend que terminamos este turno
-        await fetch('http://localhost:8080/api/juego/paso', {
+        await fetch('https://api.playchachara.com/api/juego/paso', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -478,7 +478,7 @@ async function lockCanvas(timedOut = false) {
         document.getElementById('done-msg').innerHTML = 'Esperando a los demás jugadores<span class="dots"></span>';
         
         const check = setInterval(async () => {
-            const res = await fetch(`http://localhost:8080/api/juego/${idSala}/turno/${idJugador}`);
+            const res = await fetch(`https://api.playchachara.com/api/juego/${idSala}/turno/${idJugador}`);
             const data = await res.json();
 
             if (data.juegoTerminado) {

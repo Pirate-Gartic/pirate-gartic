@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://api.playchachara.com/api';
 const idSala = localStorage.getItem('idSala');
 const esHost = localStorage.getItem('esHost');
 
@@ -15,7 +15,7 @@ function irAPantalla(url) {
 
 window.addEventListener('pagehide', () => {
     if (!navegacionInterna && idSala && esHost === 'true') {
-        fetch(`http://localhost:8080/api/salas/${idSala}`, { method: 'DELETE', keepalive: true });
+        fetch(`https://api.playchachara.com/api/salas/${idSala}`, { method: 'DELETE', keepalive: true });
     }
 });
 
@@ -34,7 +34,7 @@ if (esHost === 'true') {
 btnJugarNuevo.addEventListener('click', async () => {
             try {
                 // Le decimos a Spring Boot que aniquile los dibujos viejos
-                await fetch(`http://localhost:8080/api/salas/${idSala}/reiniciar`, { method: 'PUT' });
+                await fetch(`https://api.playchachara.com/api/salas/${idSala}/reiniciar`, { method: 'PUT' });
                 
                 //Limpiar la basura antes de ir al lobby
                 localStorage.removeItem('idCadena');
@@ -52,12 +52,12 @@ btnJugarNuevo.addEventListener('click', async () => {
 btnSalir.addEventListener('click', async () => {
     // Si el host le da a salir, destruimos la sala en la BD
     if (esHost === 'true') {
-        await fetch(`http://localhost:8080/api/salas/${idSala}`, { method: 'DELETE' });
+        await fetch(`https://api.playchachara.com/api/salas/${idSala}`, { method: 'DELETE' });
     } else {
         // Si es un jugador normal, lo eliminamos de la sala
         const idJugador = localStorage.getItem('idJugador');
         if (idJugador) {
-            await fetch(`http://localhost:8080/api/jugadores/${idJugador}`, { method: 'DELETE' });
+            await fetch(`https://api.playchachara.com/api/jugadores/${idJugador}`, { method: 'DELETE' });
         }
     }
     
@@ -130,7 +130,7 @@ if (esHost !== 'true') {
     setInterval(async () => {
         try {
             const codigoSala = localStorage.getItem('codigoSala');
-            const resp = await fetch(`http://localhost:8080/api/salas/${codigoSala}`);
+            const resp = await fetch(`https://api.playchachara.com/api/salas/${codigoSala}`);
             
             if (resp.ok) {
                 const data = await resp.json();
