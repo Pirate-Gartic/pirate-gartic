@@ -72,7 +72,7 @@ function esperarSiguienteTurno() {
 
         if (data.juegoTerminado) {
             clearInterval(check);
-            window.location.href = 'resultados.html'; // <--- REDIRIGE A RESULTADOS AL FINAL
+            window.location.href = 'results.html'; // <--- REDIRIGE A RESULTADOS AL FINAL
         } else if (data.rondaActual > rondaActual) {
             clearInterval(check);
             localStorage.setItem('idCadena', data.idCadena);
