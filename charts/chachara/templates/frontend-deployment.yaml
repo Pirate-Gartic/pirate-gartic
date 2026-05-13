@@ -9,6 +9,8 @@ spec:
       app: chachara-frontend
   template:
     metadata:
+      annotations:
+        rollout-date: {{ now | quote }}
       labels:
         app: chachara-frontend
     spec:
