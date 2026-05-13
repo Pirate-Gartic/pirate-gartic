@@ -8,24 +8,27 @@
     <link rel="stylesheet" href="styles/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
-<body>
+<body class="phrase-body">
     <img src="assets/logos/logo.png" alt="Cháchara" class="logo-corner">
+
     <div class="game-wrapper">
         <h1 id="titulo">¡Describe la situación!</h1>
 
-        <div id="imagen-previa" style="display:none; margin-bottom:15px;">
-            <img id="img-a-describir" src=""
-                style="max-width:300px; border:4px solid #000; border-radius:15px;">
+        <div id="imagen-previa" style="display:none;">
+            <img id="img-a-describir" src="" alt="Dibujo a describir">
         </div>
 
         <div class="input-card">
             <div id="timer-circle">40</div>
-            <input type="text" id="phrase-input" class="phrase-input" placeholder="Ej: Un perro alienígena...">
+            <input type="text" id="phrase-input" class="phrase-input"
+                   placeholder="Ej: Un perro alienígena..."
+                   autocomplete="off" autocorrect="off" spellcheck="false">
             <button id="btn-enviar">¡LISTO!</button>
             <p id="waiting-msg">Esperando a los demás jugadores...</p>
         </div>
     </div>
 
+    <script src="scripts/heartbeat.js"></script>
     <script src="scripts/phrase.js"></script>
 </body>
 </html>
