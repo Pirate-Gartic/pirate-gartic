@@ -4,81 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cháchara - Inicio</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* ... (MANTÉN LOS ESTILOS QUE YA TENÍAS DE LOS AVATARES Y EL DISPLAY) ... */
-        .avatar-picker {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 18px;
-        }
-
-        .avatar-option {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 50%;
-            border: 3px solid #000;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
-            background: #fff;
-        }
-
-        .avatar-option img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; display: block; }
-        .avatar-option:hover { transform: scale(1.1); }
-        .avatar-option.selected {
-            border-color: var(--btn-yellow);
-            box-shadow: 0 0 0 3px #000, 0 0 0 5px var(--btn-yellow);
-            transform: scale(1.12);
-        }
-
-        .avatar-display-box {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            border: 4px solid #000;
-            overflow: hidden;
-            background: #fff;
-            margin: 0 auto 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.25);
-            transition: transform 0.2s;
-        }
-        .avatar-display-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .avatar-display-box:hover { transform: scale(1.05); }
-
-        /* ── NUEVOS ESTILOS PARA LAS PESTAÑAS ── */
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 4px solid #000;
-        }
-        .tab {
-            flex: 1;
-            padding: 12px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            background: #2563eb;
-            color: rgba(255,255,255,0.6);
-            border: 4px solid transparent;
-            border-bottom: none;
-            cursor: pointer;
-            border-radius: 15px 15px 0 0;
-            transition: background 0.2s, color 0.2s;
-        }
-        .tab:hover { background: #1d4ed8; }
-        .tab.active {
-            background: var(--btn-yellow);
-            color: #000;
-            border-color: #000;
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-    </style>
+    <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
     <div class="doodle d1">✏️</div>
@@ -90,28 +16,27 @@
 
     <div class="login-container">
         <header class="logo">
-            <h1>CHÁCHARA</h1>
+            <img src="assets/logos/logo.png" alt="Cháchara" class="logo-img">
         </header>
 
         <div class="card">
-            
+
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('tab-crear')">CREAR SALA</button>
                 <button class="tab" onclick="switchTab('tab-unirse')">UNIRSE</button>
             </div>
 
+            <!-- ── TAB: CREAR ── -->
             <div id="tab-crear" class="tab-content active">
-                
+
                 <div id="crear-guest" class="view-section">
                     <div class="avatar-selection">
                         <div id="crear-avatar-display" class="avatar-display-box"></div>
                         <p>Elige tu avatar</p>
                     </div>
                     <div class="avatar-picker" id="crear-avatar-picker"></div>
-                    
                     <input type="text" id="crear-username" placeholder="Tu apodo (Invitado)" maxlength="15" autocomplete="off">
                     <button id="btn-crear-sala">CREAR SALA</button>
-                    
                     <div class="toggle-links">
                         <p onclick="switchSubView('crear-guest', 'crear-login')">¿Tienes cuenta? Inicia sesión para crear</p>
                     </div>
@@ -125,7 +50,6 @@
                     <input type="email" id="crear-login-email" placeholder="Correo electrónico" autocomplete="off">
                     <input type="password" id="crear-login-pass" placeholder="Contraseña">
                     <button id="btn-crear-login">ENTRAR Y CREAR</button>
-                    
                     <div class="toggle-links">
                         <p onclick="switchSubView('crear-login', 'crear-register')">¿No tienes cuenta? Regístrate</p>
                         <p onclick="switchSubView('crear-login', 'crear-guest')">Mejor como invitado</p>
@@ -149,19 +73,19 @@
 
             </div>
 
+            <!-- ── TAB: UNIRSE ── -->
             <div id="tab-unirse" class="tab-content">
-                
-                <input type="text" id="unirse-codigo" placeholder="CÓDIGO DE SALA" maxlength="6" style="text-transform: uppercase; font-weight: bold; font-size: 1.5rem; letter-spacing: 5px;">
+
+                <input type="text" id="unirse-codigo" placeholder="CÓDIGO DE SALA" maxlength="6"
+                    style="text-transform: uppercase; font-weight: bold; font-size: 1.5rem; letter-spacing: 5px;">
 
                 <div id="unirse-guest" class="view-section">
                     <div class="avatar-selection">
                         <div id="unirse-avatar-display" class="avatar-display-box"></div>
                     </div>
                     <div class="avatar-picker" id="unirse-avatar-picker"></div>
-                    
                     <input type="text" id="unirse-username" placeholder="Tu apodo (Invitado)" maxlength="15" autocomplete="off">
                     <button id="btn-unirse-sala">UNIRSE A LA SALA</button>
-                    
                     <div class="toggle-links">
                         <p onclick="switchSubView('unirse-guest', 'unirse-login')">¿Tienes cuenta? Inicia sesión para unirte</p>
                     </div>
@@ -175,7 +99,6 @@
                     <input type="email" id="unirse-login-email" placeholder="Correo electrónico" autocomplete="off">
                     <input type="password" id="unirse-login-pass" placeholder="Contraseña">
                     <button id="btn-unirse-login">ENTRAR Y UNIRSE</button>
-                    
                     <div class="toggle-links">
                         <p onclick="switchSubView('unirse-login', 'unirse-guest')">Unirse como invitado en su lugar</p>
                     </div>
@@ -186,6 +109,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="scripts/script.js"></script>
 </body>
 </html>

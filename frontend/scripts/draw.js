@@ -483,7 +483,7 @@ async function lockCanvas(timedOut = false) {
 
             if (data.juegoTerminado) {
                 clearInterval(check);
-                window.location.href = 'resultados.html'; // <--- FIN DEL JUEGO
+                window.location.href = 'results.html'; // <--- FIN DEL JUEGO
             } else if (data.rondaActual > parseInt(rondaActual)) {
                 clearInterval(check);
                 localStorage.setItem('idCadena', data.idCadena);

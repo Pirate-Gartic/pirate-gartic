@@ -22,16 +22,9 @@ public class Jugador {
     @Column(name = "es_host")
     private Boolean esHost = false;
 
-    @Column(name = "socket_id")
-    private String socketId;
-
     // Guarda la ruta relativa completa al avatar, ej: "Imagenes Chachara/Ideas de Logos/avatar_01.png"
     @Column(name = "avatar_url")
     private String avatarUrl;
-
-    // FK a cuentas — null para jugadores invitados
-    @Column(name = "id_cuenta")
-    private UUID idCuenta;
 
     public Jugador() {}
 
@@ -40,15 +33,11 @@ public class Jugador {
     public UUID getIdSala()     { return idSala; }
     public String getNickname() { return nickname; }
     public Boolean getEsHost()  { return esHost; }
-    public String getSocketId() { return socketId; }
     public String getAvatarUrl(){ return avatarUrl; }
-    public UUID getIdCuenta()   { return idCuenta; }
 
     // Setters
     public void setIdSala(UUID idSala)       { this.idSala = idSala; }
     public void setNickname(String nickname) { this.nickname = nickname; }
     public void setEsHost(Boolean esHost)    { this.esHost = esHost; }
-    public void setSocketId(String socketId) { this.socketId = socketId; }
     public void setAvatarUrl(String avatarUrl){ this.avatarUrl = avatarUrl; }
-    public void setIdCuenta(UUID idCuenta)   { this.idCuenta = idCuenta; }
 }
