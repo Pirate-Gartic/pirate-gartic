@@ -18,6 +18,9 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.backend.port }}
+          envFrom:
+            - secretRef:
+                name: chachara-secrets  # <-- Kubernetes busca el secreto
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
