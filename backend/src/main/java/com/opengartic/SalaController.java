@@ -169,6 +169,11 @@ public class SalaController {
     @DeleteMapping("/salas/{id}")
     public ResponseEntity<Void> eliminarSala(@PathVariable UUID id) {
         if (salaRepo.existsById(id)) {
+            // 1. Destruir las cadenas y dibujos de la partida
+            cadenaRepo.vaciarCadenasPorSala(id);
+            // 2. Destruir a TODOS los jugadores que estaban en esta sala
+            jugadorRepo.deleteAll(jugadorRepo.findByIdSala(id));
+            // 3. AHORA SÍ, sin nadie adentro, podemos destruir la sala
             salaRepo.deleteById(id);
         }
         return ResponseEntity.noContent().build();
@@ -177,16 +182,25 @@ public class SalaController {
     // ────────────────────────────────────────────────────────
     //  DELETE /api/jugadores/{id}
     // ────────────────────────────────────────────────────────
-    @DeleteMapping("/jugadores/{id}")
+@DeleteMapping("/jugadores/{id}")
     public ResponseEntity<?> eliminarJugador(@PathVariable UUID id) {
         Optional<Jugador> jugOpt = jugadorRepo.findById(id);
         if (jugOpt.isEmpty()) return ResponseEntity.status(404).body("Jugador no encontrado.");
         
         Jugador jugador = jugOpt.get();
         if (jugador.getEsHost()) {
-            salaRepo.deleteById(jugador.getIdSala());
-            return ResponseEntity.ok("El host salió. Sala eliminada.");
+            UUID idSala = jugador.getIdSala();
+            
+            // 1. Destruir las cadenas y dibujos
+            cadenaRepo.vaciarCadenasPorSala(idSala);
+            // 2. Destruir a todos los jugadores de esa sala (incluyendo al host)
+            jugadorRepo.deleteAll(jugadorRepo.findByIdSala(idSala));
+            // 3. AHORA SÍ, destruir la sala
+            salaRepo.deleteById(idSala);
+            
+            return ResponseEntity.ok("El host salió. Sala y jugadores eliminados correctamente.");
         } else {
+            // Si no es host, solo lo borramos a él de la base de datos
             jugadorRepo.deleteById(id);
             return ResponseEntity.ok("Jugador eliminado.");
         }
