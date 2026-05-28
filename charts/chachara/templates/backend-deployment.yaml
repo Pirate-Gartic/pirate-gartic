@@ -14,9 +14,6 @@ spec:
       labels:
         app: chachara-backend
     spec:
-      # Obliga a Kubernetes a correr este pod en el servidor Red Hat
-      nodeSelector:
-        rol: backend
       containers:
         - name: backend
           image: "{{ .Values.backend.image }}"
