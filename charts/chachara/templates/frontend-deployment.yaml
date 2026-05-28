@@ -14,9 +14,6 @@ spec:
       labels:
         app: chachara-frontend
     spec:
-      # Obliga a Kubernetes a correr este pod en el servidor Ubuntu
-      nodeSelector:
-        rol: frontend
       containers:
         - name: frontend
           image: "{{ .Values.frontend.image }}"
