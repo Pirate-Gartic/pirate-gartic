@@ -1,8 +1,6 @@
 package com.opengartic;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import java.util.UUID;
 
 @Entity
@@ -19,10 +17,9 @@ public class PasoCadena {
 
     @Column(name = "id_jugador", nullable = false)
     private UUID idJugador;
-
+    
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "tipo", columnDefinition = "tipo_paso_enum", nullable = false)
+    @Column(name = "tipo", nullable = false, length = 50)
     private TipoPaso tipo;
 
     // Para TEXTO: el texto escrito por el jugador
