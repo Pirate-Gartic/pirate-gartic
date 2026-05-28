@@ -7,9 +7,9 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "cuentas")
 public class Cuenta {
-
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id_cuenta")
     private UUID idCuenta;
 

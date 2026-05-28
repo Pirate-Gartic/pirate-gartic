@@ -25,7 +25,7 @@ spec:
             - containerPort: {{ .Values.backend.port }}
           envFrom:
             - secretRef:
-                name: chachara-secrets  # <-- Kubernetes busca el secreto para inyectar la base de datos y AWS
+                name: chachara-secrets  
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
