@@ -1,6 +1,8 @@
 package com.opengartic;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.util.UUID;
 import java.sql.Timestamp;
 
@@ -10,14 +12,13 @@ public class Sala {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id_sala")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "id_sala", length = 36)
     private UUID idSala;
 
     @Column(name = "codigo_acceso", unique = true, nullable = false, length = 6)
     private String codigoAcceso;
 
-    // Se guarda como String para evitar conflictos con el tipo enum de PostgreSQL.
-    // El valor por defecto en BD es 'ESPERANDO', aquí lo replicamos.
     @Column(name = "estado")
     private String estado = "ESPERANDO";
 
@@ -32,7 +33,6 @@ public class Sala {
 
     public Sala() {}
 
-    // Getters
     public UUID getIdSala()         { return idSala; }
     public String getCodigoAcceso() { return codigoAcceso; }
     public String getEstado()       { return estado; }
@@ -40,7 +40,6 @@ public class Sala {
     public Integer getTiempoTurno() { return tiempoTurno; }
     public Timestamp getCreadoEn()  { return creadoEn; }
 
-    // Setters
     public void setCodigoAcceso(String codigoAcceso) { this.codigoAcceso = codigoAcceso; }
     public void setEstado(String estado)             { this.estado = estado; }
     public void setMaxJugadores(Short maxJugadores)  { this.maxJugadores = maxJugadores; }
